@@ -1,0 +1,3650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .dashboard-title {
+            color: #333;
+            margin: 0;
+            flex: 1;
+            text-align: center;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            position: relative;
+            min-width: 300px;
+        }
+
+        .search-input {
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #007bff;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: #007bff;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: #0056b3;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-width: 400px;
+            min-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-mall {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+
+        .search-result-modules {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .search-result-module {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .no-results {
+            padding: 16px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .group-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .acting-title {
+            color: #2e7d32;
+        }
+        
+        .inactive-title {
+            color: #d32f2f;
+        }
+        
+        .main-group {
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .team-section .main-group {
+            margin-bottom: 15px;
+            margin-right: 20px;
+            margin-left: auto;
+            transform: scale(0.95);
+            transform-origin: right top;
+            width: calc(100% - 40px);
+        }
+        
+        .main-group-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .team-section .main-group-header {
+            padding: 12px 15px;
+            font-size: 16px;
+        }
+        
+        .k2k-header { border-left: 4px solid #ff5722; }
+        .k2g-header { border-left: 4px solid #2196f3; }
+        .g2g-header { border-left: 4px solid #4caf50; }
+        
+        .subgroups {
+            padding: 0;
+        }
+        
+        .subgroup {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        
+        .team-section .subgroup {
+            padding: 10px 18px;
+        }
+        
+        .subgroup:last-child {
+            border-bottom: none;
+        }
+        
+        .subgroup:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .subgroup-name {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 40px;
+        }
+        
+        .group-count {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .module-header {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .work-item {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .work-code {
+            font-family: monospace;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .dependency-tag {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .dependency-tag.k2g {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .dependency-tag.g2g {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .engine-tag {
+            background-color: #e1f5fe;
+            color: #0277bd;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .mall-info-section {
+            margin-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 8px;
+        }
+
+        .mall-info-header {
+            cursor: pointer;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .mall-info-header:hover {
+            background-color: #e9ecef;
+        }
+
+        .mall-count {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .mall-collapse-icon {
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .mall-info-header.collapsed .mall-collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .mall-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            padding: 8px;
+            transition: max-height 0.3s ease;
+        }
+
+        .mall-list.collapsed {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 8px;
+            border: none;
+        }
+
+        .mall-item {
+            padding: 4px 8px;
+            font-size: 0.8em;
+            color: #495057;
+            background-color: #f8f9fa;
+            margin: 2px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .team-section {
+            margin-bottom: 30px;
+        }
+        
+        .team-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 8px;
+            border-left: 5px solid #6c7ae0;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        .team-title:hover {
+            background: linear-gradient(135deg, #e8eaf6 0%, #b39ddb 100%);
+        }
+        
+        .single-work-title {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left: 5px solid #f44336;
+        }
+        
+        .single-work-title:hover {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+        }
+        
+        .team-collapse-icon {
+            float: right;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .team-collapsed .team-collapse-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .team-content {
+            max-height: 5000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .team-collapsed .team-content {
+            max-height: 0;
+        }
+        
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        .collapsible-header:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .collapse-icon {
+            float: right;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+        }
+        
+        .collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .collapsible-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsed .collapsible-content {
+            max-height: 0;
+        }
+        
+        .collapsible-content.expanded {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .collapsible-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .collapsible-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .collapsible-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .collapsible-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Group Management Dashboard</h1>
+            <div class="search-container">
+                <input type="text" 
+                       id="mallSearch" 
+                       placeholder="Search mall_id:shop_no (e.g., haveainc:1)" 
+                       class="search-input">
+                <button onclick="searchMall()" class="search-button">🔍</button>
+                <div id="searchResults" class="search-results"></div>
+            </div>
+        </div>
+        
+        <!-- Acting Groups Section -->
+        <div class="group-section">
+            <h2 class="section-title acting-title">Acting Groups</h2>
+            
+            <!-- PRO K2K Group -->
+            <div class="main-group">
+                <div class="main-group-header k2k-header">
+                    PRO K2K
+                    <span class="group-count">3</span>
+                </div>
+                <div class="subgroups">
+                    <div class="subgroup">
+                        <div class="subgroup-name">PRO 유튜브</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name">PRO B2B</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name">PRO K2K SEO ONLY</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PRO K2G Group -->
+            <div class="main-group">
+                <div class="main-group-header k2g-header">
+                    PRO K2G
+                    <span class="group-count">2</span>
+                </div>
+                <div class="subgroups">
+                    <div class="subgroup">
+                        <div class="subgroup-name">PRO K2G EN</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name">PRO K2G JP</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PRO G2G Group -->
+            <div class="main-group">
+                <div class="main-group-header g2g-header">
+                    PRO G2G
+                    <span class="group-count">2</span>
+                </div>
+                <div class="subgroups">
+                    <div class="subgroup">
+                        <div class="subgroup-name">PRO G2G EN</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name">PRO G2G JP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Inactive Groups Section -->
+        <div class="group-section">
+            <h2 class="section-title inactive-title">Inactive Groups (Work Modules)</h2>
+            
+            <!-- PAUSE Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PAUSE - K2K 서비스 일시 OFF
+                    <span class="group-count">59</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG004</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG006</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG008</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG018</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG021</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA011</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA012</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA013</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA014</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA016</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA022</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA024</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA025</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA026</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA027</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA028</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA029</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA030</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA039</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA040</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA041</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA045</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA047</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA049</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA050</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA083</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA084</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA085</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA090</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA092</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA093</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA106</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA107</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA125</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA132</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA154</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA179</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA180</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA181</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA182</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA183</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA221</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA230</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA242</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA552</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA571</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA572</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA574</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA575</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">MO010</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- YTBTKK Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    YTBTKK - K2K 유튜브 특화 전체
+                    <span class="group-count">11</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA080</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA081</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA097</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA098</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA150</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA151</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA152</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA153</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA154</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA196</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA208</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- B2B Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    B2B - B2B 특화
+                    <span class="group-count">3</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA459</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA460</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA461</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Single Work Section -->
+            <div class="team-section team-collapsed">
+                <div class="team-title single-work-title" onclick="toggleTeam(this)">
+                    Single Work
+                    <span class="group-count">47</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="team-collapse-icon">▼</span>
+                </div>
+                <div class="team-content subgroups scrollable">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG003</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG006</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG008</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG015</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG018</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG020</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG021</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG023</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG035</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG051</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG069</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA011</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA012</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA013</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA014</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA016</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA022</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA024</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA025</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA026</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA027</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA028</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA029</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA030</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA039</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA045</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA047</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA049</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA050</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA083</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA084</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA085</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA093</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA106</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA107</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA125</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA179</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA180</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA181</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA182</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA183</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA221</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA230</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA242</div>
+                    </div>
+                </div>
+            </div> <!-- End Single Work -->
+            
+            <!-- FAS운영1팀 Section -->
+            <div class="team-section team-collapsed">
+                <div class="team-title" onclick="toggleTeam(this)">
+                    FAS운영1팀
+                    <span class="team-collapse-icon">▼</span>
+                </div>
+                <div class="team-content">
+            
+            <!-- 기본혜택 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PRM1 - 기본혜택
+                    <span class="group-count">4</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA022</div>
+                    </div>
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(127 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">zzann (shop: 1)</div>
+                            <div class="mall-item">marineteo (shop: 1)</div>
+                            <div class="mall-item">doblab (shop: 1, 5)</div>
+                            <div class="mall-item">bromptonmall (shop: 1)</div>
+                            <div class="mall-item">sabona (shop: 1)</div>
+                            <div class="mall-item">kidsno1 (shop: 1)</div>
+                            <div class="mall-item">pluz12 (shop: 1)</div>
+                            <div class="mall-item">gopacific (shop: 1)</div>
+                            <div class="mall-item">hacie1 (shop: 1)</div>
+                            <div class="mall-item">kkliming (shop: 1)</div>
+                            <div class="mall-item">phn0808 (shop: 1)</div>
+                            <div class="mall-item">santa002 (shop: 1, 2)</div>
+                            <div class="mall-item">productonline (shop: 1)</div>
+                            <div class="mall-item">sytrend (shop: 1)</div>
+                            <div class="mall-item">ntbacon (shop: 1)</div>
+                            <div class="mall-item">cedartree26 (shop: 1)</div>
+                            <div class="mall-item">funflex (shop: 1, 9)</div>
+                            <div class="mall-item">sonnetcorp (shop: 1)</div>
+                            <div class="mall-item">yearning128 (shop: 1)</div>
+                            <div class="mall-item">heysummerkr (shop: 1)</div>
+                            <div class="mall-item">smartmask (shop: 1)</div>
+                            <div class="mall-item">colordin (shop: 1)</div>
+                            <div class="mall-item">clearlab100 (shop: 1)</div>
+                            <div class="mall-item">medireturn (shop: 1)</div>
+                            <div class="mall-item">fldakr (shop: 1)</div>
+                            <div class="mall-item">lgkhjg (shop: 1, 2)</div>
+                            <div class="mall-item">abluerkw (shop: 1)</div>
+                            <div class="mall-item">groupys992 (shop: 1)</div>
+                            <div class="mall-item">sfriendly (shop: 1)</div>
+                            <div class="mall-item">groupys772 (shop: 1)</div>
+                            <div class="mall-item">aromaticlabshop (shop: 1)</div>
+                            <div class="mall-item">kottiuomo (shop: 1)</div>
+                            <div class="mall-item">mytheo411 (shop: 1)</div>
+                            <div class="mall-item">ppituru (shop: 1)</div>
+                            <div class="mall-item">jksikim7 (shop: 1)</div>
+                            <div class="mall-item">odlykr (shop: 1)</div>
+                            <div class="mall-item">thedreampartner (shop: 1)</div>
+                            <div class="mall-item">veining (shop: 1)</div>
+                            <div class="mall-item">plasia22 (shop: 1)</div>
+                            <div class="mall-item">skincoding (shop: 1)</div>
+                            <div class="mall-item">lapla (shop: 1)</div>
+                            <div class="mall-item">broisterkor (shop: 1, 5)</div>
+                            <div class="mall-item">acud2025 (shop: 1, 2)</div>
+                            <div class="mall-item">formlich (shop: 1)</div>
+                            <div class="mall-item">dduk2141 (shop: 1)</div>
+                            <div class="mall-item">xrider9221 (shop: 1)</div>
+                            <div class="mall-item">drpbg77 (shop: 1)</div>
+                            <div class="mall-item">supporty1 (shop: 1)</div>
+                            <div class="mall-item">bmuet0119 (shop: 1)</div>
+                            <div class="mall-item">artigel (shop: 1)</div>
+                            <div class="mall-item">barchive23 (shop: 1)</div>
+                            <div class="mall-item">seokyung2030 (shop: 1)</div>
+                            <div class="mall-item">jjkids4031 (shop: 10)</div>
+                            <div class="mall-item">maruwell12 (shop: 1)</div>
+                            <div class="mall-item">brandiz0312 (shop: 1)</div>
+                            <div class="mall-item">biggaia77 (shop: 1)</div>
+                            <div class="mall-item">kangnam4596 (shop: 1)</div>
+                            <div class="mall-item">candlesoapstory (shop: 1, 4, 15)</div>
+                            <div class="mall-item">imdoremi (shop: 1)</div>
+                            <div class="mall-item">ai1474 (shop: 1, 6)</div>
+                            <div class="mall-item">tgfnb5242 (shop: 1)</div>
+                            <div class="mall-item">lingseoul2 (shop: 1)</div>
+                            <div class="mall-item">mahasukha (shop: 1)</div>
+                            <div class="mall-item">tiacom (shop: 2, 3, 6)</div>
+                            <div class="mall-item">shyoff (shop: 1)</div>
+                            <div class="mall-item">noticevasam (shop: 1)</div>
+                            <div class="mall-item">gkduddl2207 (shop: 1)</div>
+                            <div class="mall-item">thedaall2 (shop: 1)</div>
+                            <div class="mall-item">fabcache (shop: 1)</div>
+                            <div class="mall-item">tracy90020 (shop: 1)</div>
+                            <div class="mall-item">nightsaren (shop: 1)</div>
+                            <div class="mall-item">comfas (shop: 1)</div>
+                            <div class="mall-item">romp (shop: 1, 7)</div>
+                            <div class="mall-item">equalby (shop: 1)</div>
+                            <div class="mall-item">mrcf (shop: 1)</div>
+                            <div class="mall-item">groupys993 (shop: 1)</div>
+                            <div class="mall-item">wdrobe0507 (shop: 1)</div>
+                            <div class="mall-item">mainsun1 (shop: 1)</div>
+                            <div class="mall-item">djaaksp9911 (shop: 1)</div>
+                            <div class="mall-item">unidiet (shop: 1)</div>
+                            <div class="mall-item">phytopecia (shop: 1)</div>
+                            <div class="mall-item">few1 (shop: 1)</div>
+                            <div class="mall-item">sngy (shop: 1)</div>
+                            <div class="mall-item">buty1 (shop: 1)</div>
+                            <div class="mall-item">coozinmall (shop: 1)</div>
+                            <div class="mall-item">misslab (shop: 1)</div>
+                            <div class="mall-item">thesionco (shop: 1, 2)</div>
+                            <div class="mall-item">kuroshio83 (shop: 1)</div>
+                            <div class="mall-item">alstkd13579 (shop: 1)</div>
+                            <div class="mall-item">wadi8002 (shop: 1)</div>
+                            <div class="mall-item">piscess1 (shop: 1)</div>
+                            <div class="mall-item">bis90 (shop: 1)</div>
+                            <div class="mall-item">drumgarage02 (shop: 1)</div>
+                            <div class="mall-item">ludojewelry (shop: 1)</div>
+                            <div class="mall-item">fractal14 (shop: 1)</div>
+                            <div class="mall-item">okmijnpl2535 (shop: 1)</div>
+                            <div class="mall-item">grounded (shop: 1)</div>
+                            <div class="mall-item">afloral (shop: 1, 7)</div>
+                            <div class="mall-item">tokyo123 (shop: 1)</div>
+                            <div class="mall-item">flipflower (shop: 1)</div>
+                            <div class="mall-item">glamwell (shop: 1)</div>
+                            <div class="mall-item">menuad (shop: 1)</div>
+                            <div class="mall-item">luff101 (shop: 1)</div>
+                            <div class="mall-item">elevenmay (shop: 1)</div>
+                            <div class="mall-item">bymisoswim (shop: 1)</div>
+                            <div class="mall-item">systempler (shop: 4)</div>
+                            <div class="mall-item">ire0 (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                            <div class="mall-item">snongline (shop: 1)</div>
+                            <div class="mall-item">skyminji7 (shop: 1)</div>
+                            <div class="mall-item">minizzang7 (shop: 1)</div>
+                            <div class="mall-item">yamagobo1 (shop: 1)</div>
+                            <div class="mall-item">haancare1 (shop: 1, 3, 4, 5)</div>
+                            <div class="mall-item">mindgood (shop: 1)</div>
+                            <div class="mall-item">xmiss2004 (shop: 1)</div>
+                            <div class="mall-item">masscon (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 온사이트캠페인 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PRM2 - 온사이트캠페인
+                    <span class="group-count">5</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA087</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA184</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA551</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA552</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA553</div>
+                    </div>
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(212 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">ipposong2 (shop: 1)</div>
+                            <div class="mall-item">haveainc (shop: 1, 2)</div>
+                            <div class="mall-item">brighton00 (shop: 1)</div>
+                            <div class="mall-item">bromptonmall (shop: 1)</div>
+                            <div class="mall-item">happymajung (shop: 1)</div>
+                            <div class="mall-item">raimdrug (shop: 1)</div>
+                            <div class="mall-item">mouvepoint (shop: 1, 3)</div>
+                            <div class="mall-item">riahfolla (shop: 1)</div>
+                            <div class="mall-item">earthmall (shop: 1)</div>
+                            <div class="mall-item">housea0912 (shop: 1)</div>
+                            <div class="mall-item">nbnlkr (shop: 1)</div>
+                            <div class="mall-item">kkliming (shop: 1)</div>
+                            <div class="mall-item">phn0808 (shop: 1)</div>
+                            <div class="mall-item">jonsstyle (shop: 1)</div>
+                            <div class="mall-item">ocoomall83 (shop: 1, 4)</div>
+                            <div class="mall-item">jdaidl (shop: 1)</div>
+                            <div class="mall-item">gimaummall (shop: 1)</div>
+                            <div class="mall-item">urbanpapa (shop: 1)</div>
+                            <div class="mall-item">alrokitchen (shop: 1)</div>
+                            <div class="mall-item">yearning128 (shop: 1)</div>
+                            <div class="mall-item">lyclinc1 (shop: 1, 13)</div>
+                            <div class="mall-item">amierkorea (shop: 1, 2, 3)</div>
+                            <div class="mall-item">welcare1 (shop: 1)</div>
+                            <div class="mall-item">deersm (shop: 1)</div>
+                            <div class="mall-item">cici3913 (shop: 1)</div>
+                            <div class="mall-item">etheroom (shop: 1)</div>
+                            <div class="mall-item">alleno17 (shop: 1)</div>
+                            <div class="mall-item">sfriendly (shop: 1)</div>
+                            <div class="mall-item">thethis (shop: 1, 6)</div>
+                            <div class="mall-item">jennyoverwillow (shop: 1)</div>
+                            <div class="mall-item">lazurina001 (shop: 1)</div>
+                            <div class="mall-item">melideco (shop: 1, 3)</div>
+                            <div class="mall-item">nature0622 (shop: 1)</div>
+                            <div class="mall-item">seouli00 (shop: 1)</div>
+                            <div class="mall-item">davidhanbiz (shop: 1, 4)</div>
+                            <div class="mall-item">faurea (shop: 1)</div>
+                            <div class="mall-item">zkxkals1 (shop: 1)</div>
+                            <div class="mall-item">yyl033123 (shop: 1, 2)</div>
+                            <div class="mall-item">ortho110 (shop: 1)</div>
+                            <div class="mall-item">choyeonhong (shop: 1)</div>
+                            <div class="mall-item">loveenb (shop: 1, 4)</div>
+                            <div class="mall-item">ppituru (shop: 1)</div>
+                            <div class="mall-item">plac01 (shop: 1)</div>
+                            <div class="mall-item">odlykr (shop: 1)</div>
+                            <div class="mall-item">mtgcrew4 (shop: 1)</div>
+                            <div class="mall-item">currentbrown (shop: 1)</div>
+                            <div class="mall-item">surfea (shop: 1)</div>
+                            <div class="mall-item">lapla (shop: 1)</div>
+                            <div class="mall-item">ahaps0 (shop: 1)</div>
+                            <div class="mall-item">nw4668 (shop: 1)</div>
+                            <div class="mall-item">dressvtia (shop: 1, 6)</div>
+                            <div class="mall-item">formlich (shop: 1)</div>
+                            <div class="mall-item">dduk2141 (shop: 1, 8)</div>
+                            <div class="mall-item">howkidsful (shop: 1)</div>
+                            <div class="mall-item">ehdudtyd123 (shop: 1)</div>
+                            <div class="mall-item">mereconte (shop: 1)</div>
+                            <div class="mall-item">dkvorxhfl (shop: 1)</div>
+                            <div class="mall-item">xrider9221 (shop: 1)</div>
+                            <div class="mall-item">sonokongtoy (shop: 1, 6)</div>
+                            <div class="mall-item">foren88 (shop: 1)</div>
+                            <div class="mall-item">itiscoolthing (shop: 1)</div>
+                            <div class="mall-item">bmuet0119 (shop: 1)</div>
+                            <div class="mall-item">lemetier84 (shop: 1)</div>
+                            <div class="mall-item">seokyung2030 (shop: 1)</div>
+                            <div class="mall-item">nubo (shop: 1)</div>
+                            <div class="mall-item">cortte (shop: 1, 5)</div>
+                            <div class="mall-item">elchltd002 (shop: 1)</div>
+                            <div class="mall-item">yoons0723 (shop: 1)</div>
+                            <div class="mall-item">jchardwarestore (shop: 1)</div>
+                            <div class="mall-item">lemondetoxkorea1 (shop: 1)</div>
+                            <div class="mall-item">dayone5 (shop: 1)</div>
+                            <div class="mall-item">lemnos (shop: 1)</div>
+                            <div class="mall-item">candlesoapstory (shop: 1, 4, 15)</div>
+                            <div class="mall-item">ilhwa1 (shop: 1)</div>
+                            <div class="mall-item">eumakplus (shop: 1)</div>
+                            <div class="mall-item">rugumsp (shop: 1)</div>
+                            <div class="mall-item">aibel0 (shop: 1)</div>
+                            <div class="mall-item">ptjcorp (shop: 1, 7)</div>
+                            <div class="mall-item">oddville (shop: 1)</div>
+                            <div class="mall-item">mahasukha (shop: 1)</div>
+                            <div class="mall-item">lalahomekr (shop: 1)</div>
+                            <div class="mall-item">kyong3542 (shop: 1)</div>
+                            <div class="mall-item">ksk0027 (shop: 1)</div>
+                            <div class="mall-item">ksb455 (shop: 1)</div>
+                            <div class="mall-item">gkduddl2207 (shop: 1, 6)</div>
+                            <div class="mall-item">murrenbeauty (shop: 1, 2)</div>
+                            <div class="mall-item">lepisodekorea (shop: 1)</div>
+                            <div class="mall-item">bmfa97 (shop: 1, 6)</div>
+                            <div class="mall-item">muhan88 (shop: 1, 5)</div>
+                            <div class="mall-item">thedaall2 (shop: 1)</div>
+                            <div class="mall-item">studiogarin1 (shop: 1)</div>
+                            <div class="mall-item">dooodle (shop: 1)</div>
+                            <div class="mall-item">tsuvary (shop: 1)</div>
+                            <div class="mall-item">buddyboo (shop: 1, 2)</div>
+                            <div class="mall-item">edu25h (shop: 1, 5)</div>
+                            <div class="mall-item">convenii (shop: 1, 6)</div>
+                            <div class="mall-item">colorun (shop: 1, 2)</div>
+                            <div class="mall-item">kdhmall2020 (shop: 1)</div>
+                            <div class="mall-item">comfas (shop: 1)</div>
+                            <div class="mall-item">snpeshop (shop: 1)</div>
+                            <div class="mall-item">mocmo24 (shop: 1)</div>
+                            <div class="mall-item">romp (shop: 1, 7)</div>
+                            <div class="mall-item">beaudamo (shop: 1)</div>
+                            <div class="mall-item">jungjikmall2 (shop: 1)</div>
+                            <div class="mall-item">mcgun (shop: 1, 2)</div>
+                            <div class="mall-item">wnsgh13077 (shop: 1)</div>
+                            <div class="mall-item">mrcf (shop: 1)</div>
+                            <div class="mall-item">bysec2022 (shop: 1, 7)</div>
+                            <div class="mall-item">ideacrew8434 (shop: 1)</div>
+                            <div class="mall-item">wdrobe0507 (shop: 1)</div>
+                            <div class="mall-item">gnlwns1504 (shop: 1)</div>
+                            <div class="mall-item">negativethree3 (shop: 1)</div>
+                            <div class="mall-item">alsdud0810 (shop: 1)</div>
+                            <div class="mall-item">chinni22 (shop: 1)</div>
+                            <div class="mall-item">trendpick00 (shop: 1, 2)</div>
+                            <div class="mall-item">muziktiger (shop: 1)</div>
+                            <div class="mall-item">bogobiomall (shop: 1, 2)</div>
+                            <div class="mall-item">coozinmall (shop: 1, 3)</div>
+                            <div class="mall-item">wingbling (shop: 1, 12)</div>
+                            <div class="mall-item">moveaura (shop: 1)</div>
+                            <div class="mall-item">c9ttang (shop: 1)</div>
+                            <div class="mall-item">hiwons (shop: 1)</div>
+                            <div class="mall-item">pestoyoil (shop: 1, 3)</div>
+                            <div class="mall-item">acebiome1234 (shop: 1)</div>
+                            <div class="mall-item">organiccyclean (shop: 1)</div>
+                            <div class="mall-item">hosanna83 (shop: 1, 2)</div>
+                            <div class="mall-item">aromame77 (shop: 1)</div>
+                            <div class="mall-item">narostar (shop: 1)</div>
+                            <div class="mall-item">alstkd13579 (shop: 1)</div>
+                            <div class="mall-item">brmudkorea (shop: 1)</div>
+                            <div class="mall-item">daehwa01 (shop: 1)</div>
+                            <div class="mall-item">knifemall1 (shop: 1, 3)</div>
+                            <div class="mall-item">fractal14 (shop: 1)</div>
+                            <div class="mall-item">changefit1 (shop: 1)</div>
+                            <div class="mall-item">mysellkr (shop: 1)</div>
+                            <div class="mall-item">eaahofficial (shop: 1)</div>
+                            <div class="mall-item">xxixx0580 (shop: 1, 5, 6)</div>
+                            <div class="mall-item">imallpmg (shop: 1)</div>
+                            <div class="mall-item">useit (shop: 1)</div>
+                            <div class="mall-item">nobigdeal2022 (shop: 1)</div>
+                            <div class="mall-item">afloral (shop: 1, 7)</div>
+                            <div class="mall-item">guildstore (shop: 1)</div>
+                            <div class="mall-item">supernova2012 (shop: 1)</div>
+                            <div class="mall-item">hipeekaboo (shop: 1)</div>
+                            <div class="mall-item">son4368 (shop: 1)</div>
+                            <div class="mall-item">ubsstore4377 (shop: 1)</div>
+                            <div class="mall-item">ubsstore4378 (shop: 1)</div>
+                            <div class="mall-item">crewlinks (shop: 1)</div>
+                            <div class="mall-item">rawrow (shop: 1)</div>
+                            <div class="mall-item">menuad (shop: 1)</div>
+                            <div class="mall-item">goodorverygood (shop: 1)</div>
+                            <div class="mall-item">kind3312 (shop: 1)</div>
+                            <div class="mall-item">luff101 (shop: 1)</div>
+                            <div class="mall-item">sinsia1024 (shop: 1)</div>
+                            <div class="mall-item">ire0 (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                            <div class="mall-item">chairchair (shop: 1)</div>
+                            <div class="mall-item">snongline (shop: 1)</div>
+                            <div class="mall-item">fngbelab (shop: 1)</div>
+                            <div class="mall-item">ballvic (shop: 1, 7)</div>
+                            <div class="mall-item">minizzang7 (shop: 1, 2)</div>
+                            <div class="mall-item">pfpp (shop: 1)</div>
+                            <div class="mall-item">haancare1 (shop: 1, 3, 4, 5)</div>
+                            <div class="mall-item">coffeehc (shop: 1)</div>
+                            <div class="mall-item">ebur2231 (shop: 1)</div>
+                            <div class="mall-item">waverock5 (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SMS 발송 캠페인 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PRM3 - SMS 발송 캠페인
+                    <span class="group-count">5</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA012</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA013</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA016</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA221</div>
+                    </div>
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(62 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">rollendar (shop: 1)</div>
+                            <div class="mall-item">eastblue8282 (shop: 1)</div>
+                            <div class="mall-item">mivrine (shop: 1)</div>
+                            <div class="mall-item">richgirlcafe (shop: 1)</div>
+                            <div class="mall-item">workonit (shop: 1)</div>
+                            <div class="mall-item">jdaidl (shop: 1)</div>
+                            <div class="mall-item">productonline (shop: 1)</div>
+                            <div class="mall-item">admdada (shop: 1, 4)</div>
+                            <div class="mall-item">allbe11 (shop: 1)</div>
+                            <div class="mall-item">alrokitchen (shop: 1)</div>
+                            <div class="mall-item">goodthinkmall (shop: 1)</div>
+                            <div class="mall-item">ngumall (shop: 1)</div>
+                            <div class="mall-item">ari240201 (shop: 1)</div>
+                            <div class="mall-item">cici3913 (shop: 1)</div>
+                            <div class="mall-item">lazurina001 (shop: 1)</div>
+                            <div class="mall-item">aromaticlabshop (shop: 1)</div>
+                            <div class="mall-item">sktea (shop: 1)</div>
+                            <div class="mall-item">jtesoro103 (shop: 1)</div>
+                            <div class="mall-item">surfea (shop: 1)</div>
+                            <div class="mall-item">wriggling (shop: 1)</div>
+                            <div class="mall-item">shin25641 (shop: 1)</div>
+                            <div class="mall-item">ch0i3180 (shop: 1)</div>
+                            <div class="mall-item">drpbg77 (shop: 1)</div>
+                            <div class="mall-item">dcollec (shop: 1)</div>
+                            <div class="mall-item">jjkids4031 (shop: 10)</div>
+                            <div class="mall-item">moden12345 (shop: 1, 3)</div>
+                            <div class="mall-item">brandiz0312 (shop: 1)</div>
+                            <div class="mall-item">themoon85 (shop: 1)</div>
+                            <div class="mall-item">dayone5 (shop: 1)</div>
+                            <div class="mall-item">eumakplus (shop: 1)</div>
+                            <div class="mall-item">instinctus1 (shop: 1)</div>
+                            <div class="mall-item">eminandpaul75 (shop: 1)</div>
+                            <div class="mall-item">fobico (shop: 1)</div>
+                            <div class="mall-item">oddville (shop: 1)</div>
+                            <div class="mall-item">teddytales (shop: 1, 3)</div>
+                            <div class="mall-item">gripswany (shop: 1)</div>
+                            <div class="mall-item">dressuad (shop: 1)</div>
+                            <div class="mall-item">dooodle (shop: 1)</div>
+                            <div class="mall-item">juyabet (shop: 1)</div>
+                            <div class="mall-item">kdhmall2020 (shop: 1)</div>
+                            <div class="mall-item">mocmo24 (shop: 1)</div>
+                            <div class="mall-item">jungjikmall2 (shop: 1)</div>
+                            <div class="mall-item">wdrobe0507 (shop: 1)</div>
+                            <div class="mall-item">levdance (shop: 1)</div>
+                            <div class="mall-item">sr101 (shop: 1)</div>
+                            <div class="mall-item">mev706 (shop: 1)</div>
+                            <div class="mall-item">muziktiger (shop: 1)</div>
+                            <div class="mall-item">hiwons (shop: 1)</div>
+                            <div class="mall-item">onzak (shop: 1)</div>
+                            <div class="mall-item">legodtofficial (shop: 1)</div>
+                            <div class="mall-item">brooksbrothers (shop: 1)</div>
+                            <div class="mall-item">lifeofficial (shop: 4)</div>
+                            <div class="mall-item">organiccyclean (shop: 1)</div>
+                            <div class="mall-item">dalbangoo12 (shop: 1)</div>
+                            <div class="mall-item">mysellkr (shop: 1)</div>
+                            <div class="mall-item">eaahofficial (shop: 1)</div>
+                            <div class="mall-item">piumuniform1 (shop: 1)</div>
+                            <div class="mall-item">nobigdeal2022 (shop: 1)</div>
+                            <div class="mall-item">guildstore (shop: 1)</div>
+                            <div class="mall-item">supernova2012 (shop: 1)</div>
+                            <div class="mall-item">goodorverygood (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 친구톡 캠페인 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PRM4 - 친구톡 캠페인
+                    <span class="group-count">10</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA014</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA025</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA027</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA028</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA029</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA030</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA085</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA093</div>
+                    </div>
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(109 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">gopacific (shop: 1)</div>
+                            <div class="mall-item">mivrine (shop: 1)</div>
+                            <div class="mall-item">nbnlkr (shop: 1)</div>
+                            <div class="mall-item">richgirlcafe (shop: 1)</div>
+                            <div class="mall-item">kkotppang1622 (shop: 1)</div>
+                            <div class="mall-item">phn0808 (shop: 1)</div>
+                            <div class="mall-item">lovelingjewelry (shop: 1)</div>
+                            <div class="mall-item">workonit (shop: 1)</div>
+                            <div class="mall-item">jdaidl (shop: 1)</div>
+                            <div class="mall-item">productonline (shop: 1)</div>
+                            <div class="mall-item">urbanpapa (shop: 1)</div>
+                            <div class="mall-item">admdada (shop: 1, 4)</div>
+                            <div class="mall-item">kindabite (shop: 1)</div>
+                            <div class="mall-item">alrokitchen (shop: 1)</div>
+                            <div class="mall-item">goodthinkmall (shop: 1)</div>
+                            <div class="mall-item">moire2930 (shop: 1)</div>
+                            <div class="mall-item">ngumall (shop: 1)</div>
+                            <div class="mall-item">txorbs96 (shop: 1)</div>
+                            <div class="mall-item">ari240201 (shop: 1)</div>
+                            <div class="mall-item">cici3913 (shop: 1)</div>
+                            <div class="mall-item">maisseoul (shop: 1)</div>
+                            <div class="mall-item">lazurina001 (shop: 1)</div>
+                            <div class="mall-item">admin19 (shop: 1)</div>
+                            <div class="mall-item">paulsboutique1 (shop: 1)</div>
+                            <div class="mall-item">mytheo411 (shop: 1)</div>
+                            <div class="mall-item">zkxkals1 (shop: 1)</div>
+                            <div class="mall-item">yyl033123 (shop: 1)</div>
+                            <div class="mall-item">ortho110 (shop: 1)</div>
+                            <div class="mall-item">sktea (shop: 1)</div>
+                            <div class="mall-item">jtesoro103 (shop: 1)</div>
+                            <div class="mall-item">dongwha7112 (shop: 1)</div>
+                            <div class="mall-item">surfea (shop: 1)</div>
+                            <div class="mall-item">teeth319 (shop: 1)</div>
+                            <div class="mall-item">commonnuovo1 (shop: 1)</div>
+                            <div class="mall-item">wriggling (shop: 1)</div>
+                            <div class="mall-item">shin25641 (shop: 1)</div>
+                            <div class="mall-item">doodress (shop: 1)</div>
+                            <div class="mall-item">cacle09 (shop: 1)</div>
+                            <div class="mall-item">ch0i3180 (shop: 1)</div>
+                            <div class="mall-item">drpbg77 (shop: 1)</div>
+                            <div class="mall-item">foren88 (shop: 1)</div>
+                            <div class="mall-item">dcollec (shop: 1)</div>
+                            <div class="mall-item">jjkids4031 (shop: 10)</div>
+                            <div class="mall-item">moden12345 (shop: 1, 3)</div>
+                            <div class="mall-item">ddalku79 (shop: 1)</div>
+                            <div class="mall-item">brandiz0312 (shop: 1)</div>
+                            <div class="mall-item">themoon85 (shop: 1)</div>
+                            <div class="mall-item">jchardwarestore (shop: 1)</div>
+                            <div class="mall-item">dayone5 (shop: 1)</div>
+                            <div class="mall-item">lemnos (shop: 1)</div>
+                            <div class="mall-item">eumakplus (shop: 1)</div>
+                            <div class="mall-item">rugumsp (shop: 1)</div>
+                            <div class="mall-item">bilybabybily (shop: 1)</div>
+                            <div class="mall-item">instinctus1 (shop: 1)</div>
+                            <div class="mall-item">eminandpaul75 (shop: 1)</div>
+                            <div class="mall-item">viare0 (shop: 1)</div>
+                            <div class="mall-item">elizabeth88admin (shop: 1)</div>
+                            <div class="mall-item">fobico (shop: 1)</div>
+                            <div class="mall-item">oddville (shop: 1)</div>
+                            <div class="mall-item">muhan88 (shop: 1, 5)</div>
+                            <div class="mall-item">teddytales (shop: 1, 3)</div>
+                            <div class="mall-item">gripswany (shop: 1, 2)</div>
+                            <div class="mall-item">dressuad (shop: 1)</div>
+                            <div class="mall-item">dooodle (shop: 1)</div>
+                            <div class="mall-item">omittedkr (shop: 1, 4)</div>
+                            <div class="mall-item">juyabet (shop: 1)</div>
+                            <div class="mall-item">kdhmall2020 (shop: 1)</div>
+                            <div class="mall-item">mocmo24 (shop: 1)</div>
+                            <div class="mall-item">jungjikmall2 (shop: 1)</div>
+                            <div class="mall-item">levdance (shop: 1)</div>
+                            <div class="mall-item">hoyeonnn12 (shop: 1, 2)</div>
+                            <div class="mall-item">sr101 (shop: 1)</div>
+                            <div class="mall-item">mev706 (shop: 1)</div>
+                            <div class="mall-item">muziktiger (shop: 1)</div>
+                            <div class="mall-item">coozinmall (shop: 1)</div>
+                            <div class="mall-item">hiwons (shop: 1)</div>
+                            <div class="mall-item">onzak (shop: 1)</div>
+                            <div class="mall-item">legodtofficial (shop: 1)</div>
+                            <div class="mall-item">brooksbrothers (shop: 1)</div>
+                            <div class="mall-item">lifeofficial (shop: 4)</div>
+                            <div class="mall-item">organiccyclean (shop: 1)</div>
+                            <div class="mall-item">kiehif (shop: 1)</div>
+                            <div class="mall-item">aromame77 (shop: 1)</div>
+                            <div class="mall-item">harugonggan (shop: 1)</div>
+                            <div class="mall-item">daehwa01 (shop: 1)</div>
+                            <div class="mall-item">dalbangoo12 (shop: 1)</div>
+                            <div class="mall-item">mysellkr (shop: 1)</div>
+                            <div class="mall-item">eaahofficial (shop: 1)</div>
+                            <div class="mall-item">piumuniform1 (shop: 1)</div>
+                            <div class="mall-item">nobigdeal2022 (shop: 1)</div>
+                            <div class="mall-item">chaewoodak (shop: 1)</div>
+                            <div class="mall-item">guildstore (shop: 1)</div>
+                            <div class="mall-item">supernova2012 (shop: 1)</div>
+                            <div class="mall-item">flipflower (shop: 1)</div>
+                            <div class="mall-item">ubsstore4377 (shop: 1)</div>
+                            <div class="mall-item">goodorverygood (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                            <div class="mall-item">lijamong18 (shop: 1)</div>
+                            <div class="mall-item">collagekorea (shop: 1)</div>
+                            <div class="mall-item">masscon (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 기본혜택 + 온사이트캠페인 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PRM5 - 기본혜택 + 온사이트캠페인
+                    <span class="group-count">9</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA022</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA087</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA184</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA551</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA552</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA553</div>
+                    </div>
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(6 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">ninestar01 (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                            <div class="mall-item">fornurse1004 (shop: 1)</div>
+                            <div class="mall-item">waverock5 (shop: 1)</div>
+                            <div class="mall-item">equalife (shop: 1)</div>
+                            <div class="mall-item">yangbongnh (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 쿠폰/적립금 (기본혜택 + 친구톡 캠페인(5개)) Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PRM6 - 쿠폰/적립금 (기본혜택 + 친구톡 캠페인(5개))
+                    <span class="group-count">9</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA022</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA025</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA085</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA093</div>
+                    </div>
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(127 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">brighton00 (shop: 1)</div>
+                            <div class="mall-item">snugu (shop: 1)</div>
+                            <div class="mall-item">oymrunning (shop: 1)</div>
+                            <div class="mall-item">housea0912 (shop: 1)</div>
+                            <div class="mall-item">nbnlkr (shop: 1)</div>
+                            <div class="mall-item">richgirlcafe (shop: 1)</div>
+                            <div class="mall-item">kkotppang1622 (shop: 1)</div>
+                            <div class="mall-item">ocoomall83 (shop: 1, 4)</div>
+                            <div class="mall-item">workonit (shop: 1)</div>
+                            <div class="mall-item">bitnaluk (shop: 1)</div>
+                            <div class="mall-item">jdaidl (shop: 1)</div>
+                            <div class="mall-item">alrokitchen (shop: 1)</div>
+                            <div class="mall-item">goodthinkmall (shop: 1)</div>
+                            <div class="mall-item">amierkorea (shop: 1, 2)</div>
+                            <div class="mall-item">ngumall (shop: 1)</div>
+                            <div class="mall-item">welcare1 (shop: 1)</div>
+                            <div class="mall-item">ari240201 (shop: 1)</div>
+                            <div class="mall-item">dbxhd5453 (shop: 1)</div>
+                            <div class="mall-item">lazurina001 (shop: 1)</div>
+                            <div class="mall-item">monopen (shop: 1)</div>
+                            <div class="mall-item">admin19 (shop: 1)</div>
+                            <div class="mall-item">davidhanbiz (shop: 1, 4)</div>
+                            <div class="mall-item">kottiuomo (shop: 1)</div>
+                            <div class="mall-item">zkxkals1 (shop: 1)</div>
+                            <div class="mall-item">yyl033123 (shop: 1)</div>
+                            <div class="mall-item">ortho110 (shop: 1)</div>
+                            <div class="mall-item">dongwha7112 (shop: 1)</div>
+                            <div class="mall-item">odlykr (shop: 1)</div>
+                            <div class="mall-item">mtgcrew4 (shop: 1)</div>
+                            <div class="mall-item">currentbrown (shop: 1)</div>
+                            <div class="mall-item">surfea (shop: 1)</div>
+                            <div class="mall-item">ahaps0 (shop: 1)</div>
+                            <div class="mall-item">yepooni71 (shop: 1)</div>
+                            <div class="mall-item">jungmin5709 (shop: 1, 4)</div>
+                            <div class="mall-item">dressvtia (shop: 1, 6)</div>
+                            <div class="mall-item">teeth319 (shop: 1)</div>
+                            <div class="mall-item">commonnuovo1 (shop: 1)</div>
+                            <div class="mall-item">wriggling (shop: 1)</div>
+                            <div class="mall-item">shin25641 (shop: 1)</div>
+                            <div class="mall-item">doodress (shop: 1)</div>
+                            <div class="mall-item">dkvorxhfl (shop: 1)</div>
+                            <div class="mall-item">cacle09 (shop: 1)</div>
+                            <div class="mall-item">ch0i3180 (shop: 1)</div>
+                            <div class="mall-item">xrider9221 (shop: 1)</div>
+                            <div class="mall-item">vorio01 (shop: 1, 5)</div>
+                            <div class="mall-item">supporty1 (shop: 1)</div>
+                            <div class="mall-item">foren88 (shop: 1)</div>
+                            <div class="mall-item">dcollec (shop: 1)</div>
+                            <div class="mall-item">jjkids4031 (shop: 10)</div>
+                            <div class="mall-item">moden12345 (shop: 1, 3)</div>
+                            <div class="mall-item">ddalku79 (shop: 1)</div>
+                            <div class="mall-item">brandiz0312 (shop: 1)</div>
+                            <div class="mall-item">yoons0723 (shop: 1)</div>
+                            <div class="mall-item">jchardwarestore (shop: 1)</div>
+                            <div class="mall-item">dayone5 (shop: 1)</div>
+                            <div class="mall-item">lemnos (shop: 1)</div>
+                            <div class="mall-item">ilhwa1 (shop: 1)</div>
+                            <div class="mall-item">eumakplus (shop: 1)</div>
+                            <div class="mall-item">eminandpaul75 (shop: 1)</div>
+                            <div class="mall-item">tgfnb5242 (shop: 1)</div>
+                            <div class="mall-item">viare0 (shop: 1)</div>
+                            <div class="mall-item">fobico (shop: 1)</div>
+                            <div class="mall-item">ptjcorp (shop: 1, 7)</div>
+                            <div class="mall-item">oddville (shop: 1)</div>
+                            <div class="mall-item">tiacom (shop: 2, 3, 6)</div>
+                            <div class="mall-item">murrenbeauty (shop: 1, 2)</div>
+                            <div class="mall-item">lepisodekorea (shop: 1)</div>
+                            <div class="mall-item">muhan88 (shop: 1, 5)</div>
+                            <div class="mall-item">teddytales (shop: 1, 3)</div>
+                            <div class="mall-item">gripswany (shop: 1, 2)</div>
+                            <div class="mall-item">dressuad (shop: 1)</div>
+                            <div class="mall-item">dooodle (shop: 1)</div>
+                            <div class="mall-item">omittedkr (shop: 1, 4)</div>
+                            <div class="mall-item">juyabet (shop: 1)</div>
+                            <div class="mall-item">convenii (shop: 1, 6)</div>
+                            <div class="mall-item">kdhmall2020 (shop: 1)</div>
+                            <div class="mall-item">mocmo24 (shop: 1)</div>
+                            <div class="mall-item">diditinc (shop: 3)</div>
+                            <div class="mall-item">jungjikmall2 (shop: 1)</div>
+                            <div class="mall-item">levdance (shop: 1)</div>
+                            <div class="mall-item">keoin92 (shop: 1)</div>
+                            <div class="mall-item">sr101 (shop: 1)</div>
+                            <div class="mall-item">mev706 (shop: 1)</div>
+                            <div class="mall-item">muziktiger (shop: 1)</div>
+                            <div class="mall-item">hiwons (shop: 1)</div>
+                            <div class="mall-item">onzak (shop: 1)</div>
+                            <div class="mall-item">legodtofficial (shop: 1)</div>
+                            <div class="mall-item">brooksbrothers (shop: 1)</div>
+                            <div class="mall-item">rockportbki (shop: 1)</div>
+                            <div class="mall-item">odenserepresent (shop: 1)</div>
+                            <div class="mall-item">lifeofficial (shop: 4)</div>
+                            <div class="mall-item">pyrenexhome (shop: 1)</div>
+                            <div class="mall-item">lakai1922 (shop: 1)</div>
+                            <div class="mall-item">organiccyclean (shop: 1)</div>
+                            <div class="mall-item">aromame77 (shop: 1)</div>
+                            <div class="mall-item">genieiphone (shop: 4)</div>
+                            <div class="mall-item">harugonggan (shop: 1)</div>
+                            <div class="mall-item">dalbangoo12 (shop: 1)</div>
+                            <div class="mall-item">mysellkr (shop: 1)</div>
+                            <div class="mall-item">eaahofficial (shop: 1)</div>
+                            <div class="mall-item">toolroad (shop: 1)</div>
+                            <div class="mall-item">piumuniform1 (shop: 1)</div>
+                            <div class="mall-item">xxixx0580 (shop: 1)</div>
+                            <div class="mall-item">nobigdeal2022 (shop: 1)</div>
+                            <div class="mall-item">supernova2012 (shop: 1)</div>
+                            <div class="mall-item">ubsstore4377 (shop: 1)</div>
+                            <div class="mall-item">goodorverygood (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                            <div class="mall-item">lijamong18 (shop: 1)</div>
+                            <div class="mall-item">collagekorea (shop: 1)</div>
+                            <div class="mall-item">haancare1 (shop: 1, 3, 4, 5)</div>
+                            <div class="mall-item">coffeehc (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PRMTKK Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    PRMTKK - K2K 프로모션/CRM 전체
+                    <span class="group-count">31</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG004</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA012</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA013</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA014</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA016</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA022</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA024</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA025</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA027</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA028</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA029</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA030</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA085</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA087</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA092</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA093</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA107</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA184</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA199</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA200</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA221</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA551</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA552</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA553</div>
+                    </div>
+                    
+                    <!-- PRMTKK Mall Information -->
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(169 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">brighton00 (shop: 1)</div>
+                            <div class="mall-item">shamel8286 (shop: 1)</div>
+                            <div class="mall-item">mouvepoint (shop: 1)</div>
+                            <div class="mall-item">gopacific (shop: 1)</div>
+                            <div class="mall-item">riahfolla (shop: 1)</div>
+                            <div class="mall-item">mivrine (shop: 1)</div>
+                            <div class="mall-item">housea0912 (shop: 1)</div>
+                            <div class="mall-item">kkliming (shop: 1)</div>
+                            <div class="mall-item">richgirlcafe (shop: 1)</div>
+                            <div class="mall-item">ryqhrahf (shop: 1, 2, 7)</div>
+                            <div class="mall-item">jonsstyle (shop: 1)</div>
+                            <div class="mall-item">workonit (shop: 1)</div>
+                            <div class="mall-item">gimaummall (shop: 1)</div>
+                            <div class="mall-item">productonline (shop: 1)</div>
+                            <div class="mall-item">urbanpapa (shop: 1)</div>
+                            <div class="mall-item">hs9779 (shop: 1)</div>
+                            <div class="mall-item">ninestar01 (shop: 1)</div>
+                            <div class="mall-item">alrokitchen (shop: 1)</div>
+                            <div class="mall-item">yearning128 (shop: 1)</div>
+                            <div class="mall-item">goodthinkmall (shop: 1)</div>
+                            <div class="mall-item">lyclinc1 (shop: 1)</div>
+                            <div class="mall-item">ngumall (shop: 1)</div>
+                            <div class="mall-item">deersm (shop: 1)</div>
+                            <div class="mall-item">ari240201 (shop: 1)</div>
+                            <div class="mall-item">etheroom (shop: 1)</div>
+                            <div class="mall-item">sp89114 (shop: 1)</div>
+                            <div class="mall-item">thethis (shop: 1, 6)</div>
+                            <div class="mall-item">jennyoverwillow (shop: 1)</div>
+                            <div class="mall-item">lazurina001 (shop: 1)</div>
+                            <div class="mall-item">melideco (shop: 1)</div>
+                            <div class="mall-item">nature0622 (shop: 1)</div>
+                            <div class="mall-item">seouli00 (shop: 1)</div>
+                            <div class="mall-item">spcare01 (shop: 1, 2)</div>
+                            <div class="mall-item">gpoutdoors (shop: 1)</div>
+                            <div class="mall-item">jtesoro103 (shop: 1)</div>
+                            <div class="mall-item">ppituru (shop: 1)</div>
+                            <div class="mall-item">plac01 (shop: 1)</div>
+                            <div class="mall-item">toweljongga (shop: 1)</div>
+                            <div class="mall-item">mtgcrew4 (shop: 1)</div>
+                            <div class="mall-item">skincoding (shop: 1)</div>
+                            <div class="mall-item">surfea (shop: 1)</div>
+                            <div class="mall-item">nw4668 (shop: 1)</div>
+                            <div class="mall-item">artplex (shop: 1)</div>
+                            <div class="mall-item">dduk2141 (shop: 1)</div>
+                            <div class="mall-item">wriggling (shop: 1)</div>
+                            <div class="mall-item">howkidsful (shop: 1)</div>
+                            <div class="mall-item">shin25641 (shop: 1)</div>
+                            <div class="mall-item">ehdudtyd123 (shop: 1)</div>
+                            <div class="mall-item">ch0i3180 (shop: 1)</div>
+                            <div class="mall-item">sonokongtoy (shop: 1)</div>
+                            <div class="mall-item">dcollec (shop: 1)</div>
+                            <div class="mall-item">bmuet0119 (shop: 1)</div>
+                            <div class="mall-item">seokyung2030 (shop: 1)</div>
+                            <div class="mall-item">maruwell12 (shop: 1)</div>
+                            <div class="mall-item">nubo (shop: 1)</div>
+                            <div class="mall-item">cortte (shop: 1)</div>
+                            <div class="mall-item">elchltd002 (shop: 1)</div>
+                            <div class="mall-item">livinbalance (shop: 1)</div>
+                            <div class="mall-item">dayone5 (shop: 1)</div>
+                            <div class="mall-item">lemnos (shop: 1)</div>
+                            <div class="mall-item">candlesoapstory (shop: 1, 4, 15)</div>
+                            <div class="mall-item">eumakplus (shop: 1)</div>
+                            <div class="mall-item">bilybabybily (shop: 1)</div>
+                            <div class="mall-item">eminandpaul75 (shop: 1)</div>
+                            <div class="mall-item">fobico (shop: 1)</div>
+                            <div class="mall-item">oddville (shop: 1)</div>
+                            <div class="mall-item">mahasukha (shop: 1)</div>
+                            <div class="mall-item">kyong3542 (shop: 1)</div>
+                            <div class="mall-item">beadstamin (shop: 1, 4)</div>
+                            <div class="mall-item">shyoff (shop: 1)</div>
+                            <div class="mall-item">ksk0027 (shop: 1)</div>
+                            <div class="mall-item">ksb455 (shop: 1)</div>
+                            <div class="mall-item">gkduddl2207 (shop: 1)</div>
+                            <div class="mall-item">bmfa97 (shop: 1)</div>
+                            <div class="mall-item">goldrony (shop: 1)</div>
+                            <div class="mall-item">muhan88 (shop: 1)</div>
+                            <div class="mall-item">thedaall2 (shop: 1)</div>
+                            <div class="mall-item">teddytales (shop: 1, 3)</div>
+                            <div class="mall-item">dressuad (shop: 1)</div>
+                            <div class="mall-item">moospo (shop: 1)</div>
+                            <div class="mall-item">alzkql2 (shop: 1)</div>
+                            <div class="mall-item">buddyboo (shop: 1)</div>
+                            <div class="mall-item">juyabet (shop: 1)</div>
+                            <div class="mall-item">edu25h (shop: 1, 5)</div>
+                            <div class="mall-item">colorun (shop: 1)</div>
+                            <div class="mall-item">comfas (shop: 1)</div>
+                            <div class="mall-item">mocmo24 (shop: 1)</div>
+                            <div class="mall-item">romp (shop: 1, 7)</div>
+                            <div class="mall-item">mrcf (shop: 1)</div>
+                            <div class="mall-item">fingerheel (shop: 1)</div>
+                            <div class="mall-item">ideacrew8434 (shop: 1)</div>
+                            <div class="mall-item">yousunwkd777 (shop: 1)</div>
+                            <div class="mall-item">gnlwns1504 (shop: 1)</div>
+                            <div class="mall-item">negativethree3 (shop: 1)</div>
+                            <div class="mall-item">alsdud0810 (shop: 1)</div>
+                            <div class="mall-item">igotprice (shop: 1)</div>
+                            <div class="mall-item">levdance (shop: 1)</div>
+                            <div class="mall-item">heriter (shop: 1)</div>
+                            <div class="mall-item">chinni22 (shop: 1)</div>
+                            <div class="mall-item">sr101 (shop: 1)</div>
+                            <div class="mall-item">mev706 (shop: 1)</div>
+                            <div class="mall-item">trendpick00 (shop: 1)</div>
+                            <div class="mall-item">muziktiger (shop: 1)</div>
+                            <div class="mall-item">bogobiomall (shop: 1, 2)</div>
+                            <div class="mall-item">coozinmall (shop: 1)</div>
+                            <div class="mall-item">moveaura (shop: 1)</div>
+                            <div class="mall-item">hiwons (shop: 1)</div>
+                            <div class="mall-item">onzak (shop: 1)</div>
+                            <div class="mall-item">na820617 (shop: 1)</div>
+                            <div class="mall-item">hosanna83 (shop: 1, 2)</div>
+                            <div class="mall-item">narostar (shop: 1)</div>
+                            <div class="mall-item">alstkd13579 (shop: 1)</div>
+                            <div class="mall-item">karman0826 (shop: 1, 8)</div>
+                            <div class="mall-item">brmudkorea (shop: 1)</div>
+                            <div class="mall-item">knifemall1 (shop: 1)</div>
+                            <div class="mall-item">fractal14 (shop: 1)</div>
+                            <div class="mall-item">changefit1 (shop: 1)</div>
+                            <div class="mall-item">eaahofficial (shop: 1)</div>
+                            <div class="mall-item">tuobag (shop: 1)</div>
+                            <div class="mall-item">grounded (shop: 1)</div>
+                            <div class="mall-item">xxixx0580 (shop: 1)</div>
+                            <div class="mall-item">imallpmg (shop: 1)</div>
+                            <div class="mall-item">useit (shop: 1)</div>
+                            <div class="mall-item">nobigdeal2022 (shop: 1)</div>
+                            <div class="mall-item">afloral (shop: 1, 7)</div>
+                            <div class="mall-item">guildstore (shop: 1)</div>
+                            <div class="mall-item">supernova2012 (shop: 1)</div>
+                            <div class="mall-item">hipeekaboo (shop: 1)</div>
+                            <div class="mall-item">son4368 (shop: 1)</div>
+                            <div class="mall-item">ubsstore4377 (shop: 1)</div>
+                            <div class="mall-item">ubsstore4378 (shop: 1)</div>
+                            <div class="mall-item">crewlinks (shop: 1)</div>
+                            <div class="mall-item">rawrow (shop: 1)</div>
+                            <div class="mall-item">menuad (shop: 1)</div>
+                            <div class="mall-item">goodorverygood (shop: 1)</div>
+                            <div class="mall-item">luff101 (shop: 1)</div>
+                            <div class="mall-item">sinsia1024 (shop: 1)</div>
+                            <div class="mall-item">elevenmay (shop: 1, 5)</div>
+                            <div class="mall-item">jungsungeun (shop: 1)</div>
+                            <div class="mall-item">ire0 (shop: 1)</div>
+                            <div class="mall-item">designheal (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                            <div class="mall-item">ozonz (shop: 1)</div>
+                            <div class="mall-item">furnituredotcom (shop: 1)</div>
+                            <div class="mall-item">chairchair (shop: 1)</div>
+                            <div class="mall-item">fornurse1004 (shop: 1)</div>
+                            <div class="mall-item">lijamong18 (shop: 1)</div>
+                            <div class="mall-item">snongline (shop: 1)</div>
+                            <div class="mall-item">fngbelab (shop: 1)</div>
+                            <div class="mall-item">skyminji7 (shop: 1)</div>
+                            <div class="mall-item">ballvic (shop: 1, 7)</div>
+                            <div class="mall-item">minizzang7 (shop: 1)</div>
+                            <div class="mall-item">mindgood (shop: 1)</div>
+                            <div class="mall-item">xmiss2004 (shop: 1)</div>
+                            <div class="mall-item">waverock5 (shop: 1)</div>
+                            <div class="mall-item">equalife (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            </div> <!-- End team-content -->
+            </div> <!-- End FAS운영1팀 -->
+            
+            <!-- FAS운영2팀 Section -->
+            <div class="team-section team-collapsed">
+                <div class="team-title" onclick="toggleTeam(this)">
+                    FAS운영2팀
+                    <span class="team-collapse-icon">▼</span>
+                </div>
+                <div class="team-content">
+            
+            <!-- CSTKK Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    CSTKK - CS 전체
+                    <span class="group-count">14</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG006</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA045</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA047</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA049</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA050</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA125</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA179</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA180</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA181</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA182</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA230</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">MO010</div>
+                    </div>
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(12 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">brighton00 (shop: 1)</div>
+                            <div class="mall-item">premale (shop: 1)</div>
+                            <div class="mall-item">dooodle (shop: 1)</div>
+                            <div class="mall-item">kdhmall2020 (shop: 1)</div>
+                            <div class="mall-item">fractal14 (shop: 1)</div>
+                            <div class="mall-item">mysellkr (shop: 1)</div>
+                            <div class="mall-item">ubsstore4377 (shop: 1)</div>
+                            <div class="mall-item">ubsstore4378 (shop: 1)</div>
+                            <div class="mall-item">rawrow (shop: 1)</div>
+                            <div class="mall-item">liptongg (shop: 1)</div>
+                            <div class="mall-item">furnituredotcom (shop: 1)</div>
+                            <div class="mall-item">snongline (shop: 1)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            </div> <!-- End team-content -->
+            </div> <!-- End FAS운영2팀 -->
+            
+            <!-- FAS운영3팀 Section -->
+            <div class="team-section team-collapsed">
+                <div class="team-title" onclick="toggleTeam(this)">
+                    FAS운영3팀
+                    <span class="team-collapse-icon">▼</span>
+                </div>
+                <div class="team-content">
+            
+            <!-- SEOTKK Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    SEOTKK - K2K SEO 전체
+                    <span class="group-count">10</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG003</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG008</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG011</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG018</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG021</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG023</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG080</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SEOTKG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    SEOTKG - K2G SEO 전체
+                    <span class="group-count">9</span>
+                    <span class="dependency-tag k2g">K2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG046</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG052</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG053</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG054</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG055</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG056</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG057</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG067</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG081</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SEOTGG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    SEOTGG - G2G SEO 전체
+                    <span class="group-count">6</span>
+                    <span class="dependency-tag g2g">G2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG060</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG061</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG063</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG066</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG073</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG096</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SEO1 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    SEO1 - K2K 상품 SEO
+                    <span class="group-count">4</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG008</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG011</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SEO2 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    SEO2 - K2G 상품 SEO
+                    <span class="group-count">4</span>
+                    <span class="dependency-tag k2g">K2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG054</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG055</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG056</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG057</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SEO3 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    SEO3 - G2G 상품 SEO
+                    <span class="group-count">3</span>
+                    <span class="dependency-tag g2g">G2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG060</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG061</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG063</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SEO4 Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    SEO4 - K2K 파비콘+SNS공유이미지
+                    <span class="group-count">2</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG018</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CNTTKK Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    CNTTKK - K2K 콘텐츠 제작 전체
+                    <span class="group-count">14</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA035</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA113</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA115</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA118</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA119</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA151</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA246</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA247</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA248</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA249</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA250</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA255</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA456</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA524</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CNTTKG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    CNTTKG - K2G 콘텐츠 제작 전체
+                    <span class="group-count">2</span>
+                    <span class="dependency-tag k2g">K2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA773</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA774</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CNTTGG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    CNTTGG - G2G 콘텐츠 제작 전체
+                    <span class="group-count">2</span>
+                    <span class="dependency-tag g2g">G2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA812</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA837</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DESKK Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    DESKK - K2K 디자인 제작
+                    <span class="group-count">7</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA035</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA113</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA115</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA118</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA119</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA151</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA456</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DESKG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    DESKG - K2G 디자인 제작
+                    <span class="group-count">2</span>
+                    <span class="dependency-tag k2g">K2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA773</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA774</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DESGG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    DESGG - G2G 디자인 제작
+                    <span class="group-count">2</span>
+                    <span class="dependency-tag g2g">G2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA812</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA837</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MTKK Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    MTKK - K2K 몰 구축/리뉴얼
+                    <span class="group-count">3</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG020</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA036</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MTKG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    MTKG - K2G 몰 구축/리뉴얼
+                    <span class="group-count">2</span>
+                    <span class="dependency-tag k2g">K2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA785</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA786</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MTGG Module -->
+            <div class="main-group collapsed">
+                <div class="main-group-header module-header collapsible-header" onclick="toggleCollapse(this)">
+                    MTGG - G2G 몰 구축/리뉴얼
+                    <span class="group-count">2</span>
+                    <span class="dependency-tag g2g">G2G</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subgroups collapsible-content">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA835</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA836</div>
+                    </div>
+                </div>
+            </div>
+            </div> <!-- End team-content -->
+            </div> <!-- End FAS운영3팀 -->
+        </div>
+    </div>
+
+    <script>
+        // Engine mapping
+        const engineData = {
+            "EG001": true, "EG003": true, "EG004": true, "EG005": true, "EG006": true,
+            "EG007": true, "EG008": true, "EG009": true, "EG010": true, "EG011": true,
+            "EG015": true, "EG017": true, "EG018": true, "EG019": true, "EG020": true,
+            "EG021": true,
+            "EG023": true, "EG035": true, "EG046": true, "EG051": true, "EG052": true, "EG069": true,
+            "EG053": true, "EG054": true, "EG055": true, "EG056": true, "EG057": true,
+            "EG060": true, "EG061": true, "EG063": true, "EG066": true, "EG067": true,
+            "EG073": true, "EG080": true, "EG081": true, "EG096": true, "FA001": true, "FA005": true,
+            "FA007": true, "FA009": true, "FA010": true, "FA011": true, "FA012": true,
+            "FA013": true, "FA014": true, "FA016": true, "FA017": true, "FA019": true,
+            "FA022": true, "FA024": true, "FA025": true, "FA026": true, "FA027": true,
+            "FA028": true, "FA029": true,
+            "FA030": true, "FA035": false, "FA036": true, "FA039": true, "FA040": true,
+            "FA041": true, "FA045": true, "FA047": true, "FA049": true, "FA050": true,
+            "FA080": true, "FA081": false, "FA083": true, "FA084": true, "FA085": true,
+            "FA087": false, "FA090": true, "FA092": true, "FA093": true, "FA097": true,
+            "FA098": false, "FA106": true, "FA107": true, "FA113": false, "FA115": false,
+            "FA118": false, "FA119": true, "FA125": true, "FA132": true, "FA150": false,
+            "FA151": false, "FA152": false, "FA153": false, "FA154": true, "FA179": true,
+            "FA180": true, "FA181": true, "FA182": true, "FA183": true, "FA184": false,
+            "FA196": true, "FA199": true, "FA200": true,
+            "FA208": true, "FA221": true, "FA230": true, "FA242": true, "FA246": false,
+            "FA247": false, "FA248": false, "FA249": false, "FA250": false, "FA255": false,
+            "FA456": false, "FA459": false, "FA460": false, "FA461": false, "FA524": false,
+            "FA551": true, "FA552": true, "FA553": true, "FA571": true, "FA572": true,
+            "FA574": true, "FA575": true, "FA773": false, "FA774": false, "FA785": false,
+            "FA786": false, "FA812": false, "FA835": false, "FA836": false, "FA837": false,
+            "MO010": false
+        };
+
+        // Work titles mapping
+        const workTitles = {
+            "EG001": "[D2C]CS_배송완료 자동체크 앱 충전관리",
+            "EG003": "[디지털 경험 최적화] 게시판 SEO 기본설정",
+            "EG004": "[운영 효율성 제고] 메시지 LMS 사용 기본 설정",
+            "EG005": "[운영 효율성 제고] 알림톡 사용 기본 설정",
+            "EG006": "[운영 효율성 제고] 배송완료 자동체크 앱 사용 설정",
+            "EG007": "프로모션_회원가입 자동알림 사용설정",
+            "EG008": "[D2C] 상품 SEO 설정(전체상품-초기)",
+            "EG009": "상품 SEO 설정(신상품-FAS수집)",
+            "EG010": "상품 SEO 설정(신상품-EC수집)",
+            "EG011": "[상품 경쟁력 강화] 상품 SEO 관리 자동화",
+            "EG015": "[D2C]프로모션/CRM_프로모션 제안 생성 (시스템 제안)",
+            "EG017": "파비콘 설정",
+            "EG018": "SNS 공유 이미지 생성",
+            "EG019": "몰리뉴얼 알림 및 제안",
+            "EG020": "몰리뉴얼 스킨 생성 (2)",
+            "EG021": "[디지털 경험 최적화] 사이트 SEO 기본설정",
+            "EG023": "쇼핑몰 속도 최적화",
+            "EG035": "[디지털 경험 최적화] 랜딩페이지 A/B 테스트 설정",
+            "EG046": "[글로벌] 파비콘 설정(승인+7일)",
+            "EG051": "[운영 효율성 제고] 자동 주문 취소 시스템",
+            "EG052": "[글로벌] 사이트 SEO 기본설정",
+            "EG053": "[글로벌] 게시판 SEO 기본설정",
+            "EG054": "상품 SEO 설정(전체상품-초기)",
+            "EG055": "상품 SEO 설정(신상품-FAS수집)",
+            "EG056": "상품 SEO 설정(신상품-EC수집)",
+            "EG057": "[상품 경쟁력 강화] 상품 SEO 관리 자동화",
+            "EG060": "[G2G] 카페24 PRO 신규 상품 SEO 생성 및 최적화",
+            "EG061": "[G2G] 쇼핑몰 신규 상품 SEO 생성 및 최적화",
+            "EG063": "[G2G] 전체 상품 SEO 생성 및 최적화",
+            "EG066": "[G2G] SNS 공유 이미지 생성(승인+7일)",
+            "EG067": "쇼핑몰 속도 최적화",
+            "EG069": "[고객 관리 최적화] 고객 세그먼테이션 자동화",
+            "EG073": "[G2G] 게시판 SEO 기본설정",
+            "EG080": "구글네이버 검색엔진 설정 유도 알림",
+            "EG081": "(K2G) 구글네이버 검색엔진 설정 유도 알림",
+            "EG096": "[G2G] 사이트 SEO 기본설정",
+            "FA001": "[4종 혜택 고도화] 회원가입 혜택 세팅",
+            "FA005": "첫전환 첫구매할인쿠폰안내 친구톡(승인+7일)",
+            "FA007": "재구매유도 마지막구매30일 무료배송쿠폰 친구톡(승인+7일)",
+            "FA009": "[퍼널 최적화] 장바구니이탈 방지 SMS 발송(승인+7일)",
+            "FA010": "[고객 유지 및 관리] 장바구니 추가 버튼 설정",
+            "FA011": "[퍼널 최적화] 원터치 주문서 전환 설정",
+            "FA012": "[퍼널 최적화] 쿠폰 만료 자동 알림 설정 (SMS/알림톡)",
+            "FA013": "[퍼널 최적화] 장기 미접속(180일) 유저 적립금 리마인드 SMS 발송(승인+7일)",
+            "FA014": "장바구니이탈 이탈3일 리마인드 친구톡(승인+7일)",
+            "FA016": "[퍼널 최적화] 장기 미접속(180일) 유저 재방문 리마인드 SMS 발송(승인+7일)",
+            "FA017": "[KRKR-MM-PRM-CPN-SAV-001] 생일 할인 쿠폰 발급 설정",
+            "FA019": "[고객 충성도 증대] 회원 수신동의 적립금 증정 이벤트 설정",
+            "FA022": "리뷰작성혜택 설정",
+            "FA024": "[고객 유지 및 관리] 휴면회원 기능 해제",
+            "FA025": "이탈방지 마지막로그인187일 재방문할인쿠폰 친구톡(승인+7일)",
+            "FA026": "[D2C]프로모션_신상품 할인 적용 (유튜브포함)",
+            "FA027": "첫전환 베스트상품안내 친구톡(승인+7일)",
+            "FA028": "첫전환 조회수높은상품안내 친구톡(승인+7일)",
+            "FA029": "재구매유도 마지막구매10일 재구매높은상품 친구톡(승인+7일)",
+            "FA030": "재구매유도 마지막구매90일 장바구니인기상품 친구톡(승인+7일)",
+            "FA035": "[D2C]콘텐츠_브랜드가치제고_메인페이지브랜드대배너제공",
+            "FA036": "[D2C]구축_브랜드가치제고_쇼핑몰구축",
+            "FA039": "[D2C]콘텐츠_브랜드가치제고_심미성AI진단",
+            "FA040": "[D2C]SEO_최적화_사이트SEO설정(EC)",
+            "FA041": "[D2C]SEO_최적화_상품SEO설정(EC)",
+            "FA045": "[D2C]CS_고객관리_FAQ기본설정001(EC)",
+            "FA047": "[D2C]CS_고객관리_FAQ맞춤보강001(EC)",
+            "FA049": "[D2C]CS_고객관리_FAQ경로상세조정(메인노출)",
+            "FA050": "[D2C]CS_이용정보제공_자동알림메세지점검및개선",
+            "FA080": "[D2C]마케팅_판로확대_유튜브전용몰기본설정",
+            "FA081": "[D2C]마케팅_판로확대_유튜브전용몰상품연동",
+            "FA083": "[고객 가치 제공] SMS 자동 충전",
+            "FA084": "[고객 가치 제공] 대량 메일 자동 충전",
+            "FA085": "이탈방지 마지막로그인365일 재방문할인쿠폰 친구톡(승인+7일)",
+            "FA087": "[D2C]프로모션_판매촉진_장바구니이탈고객대상할인쿠폰배너노출",
+            "FA090": "[마켓]상품_기본설정_오픈마켓이미지노출관리",
+            "FA092": "[서비스 접근성 강화] 카카오싱크 설정 체크",
+            "FA093": "재구매유도 마지막구매180일 재구매할인쿠폰 친구톡(승인+7일)",
+            "FA097": "[D2C]마케팅_트래픽확보_마케팅채널연결005-1(내부_유튜브전용몰생성)",
+            "FA098": "마케팅채널연결_005-2(내부_유튜브어필리에이트서비스)",
+            "FA106": "[D2C]상품_판매촉진_추가구매상품추천",
+            "FA107": "[구매 전환 및 반복 구매 유도] 쿠폰 기본 설정",
+            "FA113": "[D2C]콘텐츠_브랜드가치제고_상세페이지고객센터콘텐츠제공",
+            "FA115": "[D2C]콘텐츠_브랜드가치제고_상세페이지브랜드컨셉콘텐츠제공",
+            "FA118": "[D2C]콘텐츠_판매촉진_메인페이지신상품대배너제공",
+            "FA119": "[D2C]콘텐츠_판매촉진_상품 썸네일_사이즈개선",
+            "FA125": "[D2C]CS_이용정보제공_재입고알림기능제공",
+            "FA132": "프로모션/CRM운영을위한설정감지및자동안내",
+            "FA150": "[D2C]유튜브쇼핑전용스토어_구축_브랜드가치제고_기본정보설정",
+            "FA151": "[D2C]유튜브쇼핑전용스토어_콘텐츠_최적화_상세페이지상품정보콘텐츠제공",
+            "FA152": "[D2C]유튜브쇼핑전용스토어_상품_판매촉진_신규상품등록",
+            "FA153": "[D2C]유튜브쇼핑전용스토어_상품_판매촉진_상품정보수정",
+            "FA154": "[D2C]유튜브쇼핑전용스토어_프로모션_판매촉진_신상품할인이벤트실행",
+            "FA179": "[D2C]v2_빠른 결제 사용",
+            "FA180": "[D2C]v2_취소/교환/반품 접수 응답 자동화",
+            "FA181": "[D2C]v2_취소/교환/반품 정보 리포팅",
+            "FA182": "[D2C]v2_취소/교환/반품 CRM메시지 기본 설정",
+            "FA183": "[D2C] 메인페이지 진열 관리",
+            "FA184": "[D2C]프로모션_판매촉진_동일상품조회고객대상할인쿠폰배너노출",
+            "FA196": "[공통]온보딩_기본 _유튜브쇼핑 및 채널 설정",
+            "FA199": "[서비스 접근성 강화] 카카오 알림톡/친구톡 기본 설정 체크",
+            "FA200": "[서비스 접근성 강화] 카카오친구톡 캠페인 설정 체크",
+            "FA208": "[공통]환경세팅_몰분석_유튜브세팅여부판별_001",
+            "FA221": "[고객 충성도 증대] 리뷰작성유도 설정(승인+7일)",
+            "FA230": "[D2C]CS_환경세팅_비사용 게시판 정리",
+            "FA242": "[D2C]상품_ 최적화_인기상품 분류 자동 관리",
+            "FA246": "[D2C]콘텐츠_사이트최적화_UI진단및개선_메인페이지",
+            "FA247": "[D2C]콘텐츠_사이트최적화_UI진단및개선_상품분류페이지",
+            "FA248": "[D2C]콘텐츠_사이트최적화_UI진단및개선_상품상세페이지",
+            "FA249": "[D2C]콘텐츠_사이트최적화_UI진단및개선_장바구니",
+            "FA250": "[D2C]콘텐츠_사이트최적화_UI진단및개선_로그인",
+            "FA255": "[D2C]콘텐츠_사이트최적화_UI진단및개선_검색페이지",
+            "FA456": "[D2C]콘텐츠_동영상제작지원_SNS및외부배너표준사이즈제작및제공",
+            "FA459": "[B2B]브랜드 스토리 생성 및 페이지 구축",
+            "FA460": "[B2B] 브랜드 스토리 생성 및 페이지 구축_프랜차이즈 성공사례",
+            "FA461": "[B2B]UX_거래가이드_페이지제작",
+            "FA524": "[D2C]콘텐츠_사이트최적화_UI진단및개선_회원가입페이지",
+            "FA551": "(알파푸시) 첫 방문 고객 대상 인기 상품 추천 캠페인 (승인+7일)",
+            "FA552": "[D2C]프로모션_고민 중인 고객 대상 인기 상품 추천 캠페인",
+            "FA553": "(알파푸시) 회원가입 완료 대상 인기 상품 추천 캠페인 (승인+7일)",
+            "FA571": "[상품 경쟁력 강화] 쇼핑몰 신규 상품 SEO 생성 및 최적화",
+            "FA572": "[상품 경쟁력 강화] 카페24 PRO 신규 상품 SEO 생성 및 최적화",
+            "FA574": "SNS 공유 이미지 생성",
+            "FA575": "파비콘 설정",
+            "FA773": "[K2G]영문몰 배너 제작",
+            "FA774": "[K2G]일문몰 배너 제작",
+            "FA785": "[K2G]영문몰 스킨 제작",
+            "FA786": "[K2G]일문몰 스킨 제작",
+            "FA812": "[G2G]영문몰 배너 제작",
+            "FA835": "[G2G]영문몰 스킨 제작",
+            "FA836": "[G2G]일문몰 스킨 제작",
+            "FA837": "[G2G]일문몰 배너 제작",
+            "MO010": "[모니터링 자동화]고객관리_FAQ기본설정001(EC)",
+            "FA009": "[퍼널 최적화] 장바구니이탈 방지 SMS 발송(승인+7일)",
+            "FA012": "[퍼널 최적화] 쿠폰 만료 자동 알림 설정",
+            "FA013": "[퍼널 최적화] 장기 미접속(180일) 유저 적립금 리마인드 SMS 발송(승인+7일)",
+            "FA016": "[퍼널 최적화] 장기 미접속(180일) 유저 재방문 리마인드 SMS 발송(승인+7일)",
+            "FA221": "[고객 충성도 증대] 리뷰작성유도 설정(승인+7일)",
+            "FA005": "첫전환 첫구매할인쿠폰안내 친구톡(승인+7일)",
+            "FA007": "재구매유도 마지막구매30일 무료배송쿠폰 친구톡(승인+7일)",
+            "FA014": "장바구니이탈 이탈3일 리마인드 친구톡(승인+7일)",
+            "FA025": "이탈방지 마지막로그인187일 재방문할인쿠폰 친구톡(승인+7일)",
+            "FA027": "첫전환 베스트상품안내 친구톡(승인+7일)",
+            "FA028": "첫전환 조회수높은상품안내 친구톡(승인+7일)",
+            "FA029": "재구매유도 마지막구매10일 재구매높은상품 친구톡(승인+7일)",
+            "FA030": "재구매유도 마지막구매90일 장바구니인기상품 친구톡(승인+7일)",
+            "FA085": "이탈방지 마지막로그인365일 재방문할인쿠폰 친구톡(승인+7일)",
+            "FA093": "재구매유도 마지막구매180일 재구매할인쿠폰 친구톡(승인+7일)",
+            "FA024": "[고객 유지 및 관리] 휴면회원 기능 해제",
+            "FA010": "[고객 유지 및 관리] 장바구니 추가 버튼 설정",
+            "FA092": "[서비스 접근성 강화] 카카오싱크 설정 체크",
+            "FA200": "[서비스 접근성 강화] 카카오친구톡 캠페인 설정 체크",
+            "FA199": "[서비스 접근성 강화] 카카오 알림톡/친구톡 기본 설정 체크",
+            "FA107": "[구매 전환 및 반복 구매 유도] 쿠폰 기본 설정",
+            "EG004": "[운영 효율성 제고] 메시지 LMS 사용 기본 설정",
+            "FA196": "[공통]온보딩_기본 _유튜브쇼핑 및 채널 설정",
+            "FA080": "[D2C]마케팅_판로확대_유튜브전용몰기본설정",
+            "FA081": "[D2C]마케팅_판로확대_유튜브전용몰상품연동",
+            "FA097": "[D2C]마케팅_트래픽확보_마케팅채널연결005-1(내부_유튜브전용몰생성)",
+            "FA098": "마케팅채널연결_005-2(내부_유튜브어필리에이트서비스)",
+            "FA150": "[D2C]유튜브쇼핑전용스토어_구축_브랜드가치제고_기본정보설정",
+            "FA151": "[D2C]유튜브쇼핑전용스토어_콘텐츠_최적화_상세페이지상품정보콘텐츠제공",
+            "FA152": "[D2C]유튜브쇼핑전용스토어_상품_판매촉진_신규상품등록",
+            "FA153": "[D2C]유튜브쇼핑전용스토어_상품_판매촉진_상품정보수정",
+            "FA154": "[D2C]유튜브쇼핑전용스토어_프로모션_판매촉진_신상품할인이벤트실행",
+            "FA208": "[공통]환경세팅_몰분석_유튜브세팅여부판별_001",
+            "FA459": "[B2B]브랜드 스토리 생성 및 페이지 구축",
+            "FA460": "[B2B] 브랜드 스토리 생성 및 페이지 구축_프랜차이즈 성공사례",
+            "FA461": "[B2B]UX_거래가이드_페이지제작",
+            "EG003": "[디지털 경험 최적화] 게시판 SEO 기본설정",
+            "EG008": "[D2C] 상품 SEO 설정(전체상품-초기)",
+            "EG009": "상품 SEO 설정(신상품-FAS수집)",
+            "EG010": "상품 SEO 설정(신상품-EC수집)",
+            "EG011": "[상품 경쟁력 강화] 상품 SEO 관리 자동화",
+            "EG017": "파비콘 설정",
+            "EG018": "SNS 공유 이미지 생성",
+            "EG021": "[디지털 경험 최적화] 사이트 SEO 기본설정",
+            "EG023": "쇼핑몰 속도 최적화",
+            "EG080": "구글네이버 검색엔진 설정 유도 알림",
+            "EG046": "[글로벌] 파비콘 설정(승인+7일)",
+            "EG052": "[글로벌] 사이트 SEO 기본설정",
+            "EG053": "[글로벌] 게시판 SEO 기본설정",
+            "EG054": "상품 SEO 설정(전체상품-초기)",
+            "EG055": "상품 SEO 설정(신상품-FAS수집)",
+            "EG056": "상품 SEO 설정(신상품-EC수집)",
+            "EG057": "[상품 경쟁력 강화] 상품 SEO 관리 자동화",
+            "EG067": "쇼핑몰 속도 최적화",
+            "EG081": "(K2G) 구글네이버 검색엔진 설정 유도 알림",
+            "EG060": "[G2G] 카페24 PRO 신규 상품 SEO 생성 및 최적화",
+            "EG061": "[G2G] 쇼핑몰 신규 상품 SEO 생성 및 최적화",
+            "EG063": "[G2G] 전체 상품 SEO 생성 및 최적화",
+            "EG066": "[G2G] SNS 공유 이미지 생성(승인+7일)",
+            "EG073": "[G2G] 게시판 SEO 기본설정",
+            "EG096": "[G2G] 사이트 SEO 기본설정",
+            "FA035": "[D2C]콘텐츠_브랜드가치제고_메인페이지브랜드대배너제공",
+            "FA113": "[D2C]콘텐츠_브랜드가치제고_상세페이지고객센터콘텐츠제공",
+            "FA115": "[D2C]콘텐츠_브랜드가치제고_상세페이지브랜드컨셉콘텐츠제공",
+            "FA118": "[D2C]콘텐츠_판매촉진_메인페이지신상품대배너제공",
+            "FA119": "[D2C]콘텐츠_판매촉진_상품 썸네일_사이즈개선",
+            "FA246": "[D2C]콘텐츠_사이트최적화_UI진단및개선_메인페이지",
+            "FA247": "[D2C]콘텐츠_사이트최적화_UI진단및개선_상품분류페이지",
+            "FA248": "[D2C]콘텐츠_사이트최적화_UI진단및개선_상품상세페이지",
+            "FA249": "[D2C]콘텐츠_사이트최적화_UI진단및개선_장바구니",
+            "FA250": "[D2C]콘텐츠_사이트최적화_UI진단및개선_로그인",
+            "FA255": "[D2C]콘텐츠_사이트최적화_UI진단및개선_검색페이지",
+            "FA524": "[D2C]콘텐츠_사이트최적화_UI진단및개선_회원가입페이지",
+            "FA456": "[D2C]콘텐츠_동영상제작지원_SNS및외부배너표준사이즈제작및제공",
+            "FA773": "[K2G]영문몰 배너 제작",
+            "FA774": "[K2G]일문몰 배너 제작",
+            "FA812": "[G2G]영문몰 배너 제작",
+            "FA837": "[G2G]일문몰 배너 제작",
+            "EG019": "몰리뉴얼 알림 및 제안",
+            "EG020": "몰리뉴얼 스킨 생성 (2)",
+            "FA036": "[D2C]구축_브랜드가치제고_쇼핑몰구축",
+            "FA785": "[K2G]영문몰 스킨 제작",
+            "FA786": "[K2G]일문몰 스킨 제작",
+            "FA835": "[G2G]영문몰 스킨 제작",
+            "FA836": "[G2G]일문몰 스킨 제작"
+        };
+
+        // Group data structure
+        const groupData = {
+            acting: {
+                "PRO K2K": [
+                    "PRO 유튜브",
+                    "PRO B2B", 
+                    "PRO K2K SEO ONLY"
+                ],
+                "PRO K2G": [
+                    "PRO K2G EN",
+                    "PRO K2G JP"
+                ],
+                "PRO G2G": [
+                    "PRO G2G EN",
+                    "PRO G2G JP"
+                ]
+            },
+            inactive: {
+                "기본혜택": {
+                    works: ["FA001", "FA017", "FA019", "FA022"],
+                    dependency: "K2K"
+                },
+                "온사이트캠페인": {
+                    works: ["FA551", "FA552", "FA553", "FA087", "FA184"],
+                    dependency: "K2K"
+                },
+                "SMS 발송 캠페인": {
+                    works: ["FA009", "FA012", "FA013", "FA016", "FA221"],
+                    dependency: "K2K"
+                },
+                "친구톡 캠페인": {
+                    works: ["FA005", "FA007", "FA014", "FA025", "FA027", "FA028", "FA029", "FA030", "FA085", "FA093"],
+                    dependency: "K2K"
+                },
+                "기본혜택 + 온사이트캠페인": {
+                    works: ["FA001", "FA017", "FA019", "FA022", "FA551", "FA552", "FA553", "FA087", "FA184"],
+                    dependency: "K2K"
+                },
+                "쿠폰/적립금 (기본혜택 + 친구톡 캠페인(5개))": {
+                    works: ["FA001", "FA017", "FA019", "FA022", "FA005", "FA007", "FA025", "FA085", "FA093"],
+                    dependency: "K2K"
+                },
+                "K2K 프로모션/CRM 전체": {
+                    works: ["FA001", "FA017", "FA019", "FA022", "FA551", "FA552", "FA553", "FA087", "FA184", "FA005", "FA007", "FA014", "FA025", "FA027", "FA028", "FA029", "FA030", "FA085", "FA093", "FA013", "FA016", "FA009", "FA221", "FA012", "FA024", "FA010", "FA092", "FA200", "FA199", "FA107", "EG004"],
+                    dependency: "K2K"
+                },
+                "K2K 유튜브 특화 전체": {
+                    works: ["FA196", "FA080", "FA081", "FA097", "FA098", "FA150", "FA151", "FA152", "FA153", "FA154", "FA208"],
+                    dependency: "K2K"
+                },
+                "B2B 특화": {
+                    works: ["FA459", "FA460", "FA461"],
+                    dependency: "K2K"
+                },
+                "K2K SEO 전체": {
+                    works: ["EG003", "EG008", "EG009", "EG010", "EG011", "EG017", "EG018", "EG021", "EG023", "EG080"],
+                    dependency: "K2K"
+                },
+                "K2G SEO 전체": {
+                    works: ["EG046", "EG052", "EG053", "EG054", "EG055", "EG056", "EG057", "EG067", "EG081"],
+                    dependency: "K2G"
+                },
+                "G2G SEO 전체": {
+                    works: ["EG060", "EG061", "EG063", "EG066", "EG073", "EG096"],
+                    dependency: "G2G"
+                },
+                "K2K 상품 SEO": {
+                    works: ["EG008", "EG009", "EG010", "EG011"],
+                    dependency: "K2K"
+                },
+                "K2G 상품 SEO": {
+                    works: ["EG054", "EG055", "EG056", "EG057"],
+                    dependency: "K2G"
+                },
+                "G2G 상품 SEO": {
+                    works: ["EG060", "EG061", "EG063"],
+                    dependency: "G2G"
+                },
+                "K2K 파비콘+SNS공유이미지": {
+                    works: ["EG017", "EG018"],
+                    dependency: "K2K"
+                },
+                "K2K 콘텐츠 제작 전체": {
+                    works: ["FA035", "FA113", "FA115", "FA118", "FA119", "FA151", "FA246", "FA247", "FA248", "FA249", "FA250", "FA255", "FA524", "FA456"],
+                    dependency: "K2K"
+                },
+                "K2G 콘텐츠 제작 전체": {
+                    works: ["FA773", "FA774"],
+                    dependency: "K2G"
+                },
+                "G2G 콘텐츠 제작 전체": {
+                    works: ["FA812", "FA837"],
+                    dependency: "G2G"
+                },
+                "K2K 디자인 제작": {
+                    works: ["FA035", "FA113", "FA115", "FA118", "FA119", "FA151", "FA456"],
+                    dependency: "K2K"
+                },
+                "K2G 디자인 제작": {
+                    works: ["FA773", "FA774"],
+                    dependency: "K2G"
+                },
+                "G2G 디자인 제작": {
+                    works: ["FA812", "FA837"],
+                    dependency: "G2G"
+                },
+                "K2K 몰 구축/리뉴얼": {
+                    works: ["EG019", "EG020", "FA036"],
+                    dependency: "K2K"
+                },
+                "K2G 몰 구축/리뉴얼": {
+                    works: ["FA785", "FA786"],
+                    dependency: "K2G"
+                },
+                "G2G 몰 구축/리뉴얼": {
+                    works: ["FA835", "FA836"],
+                    dependency: "G2G"
+                }
+            }
+        };
+
+        // Function to create work item with code, title, and engine label
+        function createWorkItem(workCode) {
+            const title = workTitles[workCode] || 'Title not found';
+            const isEngine = engineData[workCode];
+            const engineLabel = isEngine === true ? '<span class="engine-tag">ENGINE</span>' : '';
+            return `<span class="work-code">${workCode}</span> - ${title}${engineLabel}`;
+        }
+
+        // Toggle collapse functionality for team sections
+        function toggleTeam(teamTitle) {
+            const teamSection = teamTitle.parentElement;
+            teamSection.classList.toggle('team-collapsed');
+        }
+
+        // Toggle collapse functionality for mall information
+        function toggleMallInfo(header) {
+            const mallList = header.nextElementSibling;
+            const icon = header.querySelector('.mall-collapse-icon');
+            
+            header.classList.toggle('collapsed');
+            mallList.classList.toggle('collapsed');
+        }
+
+        // Mall to modules mapping (for now just PRM2, will be expanded)
+        const mallModuleMapping = {
+            'ipposong2:1': ['PRM2'],
+            'haveainc:1': ['PRM2'],
+            'haveainc:2': ['PRM2'],
+            'brighton00:1': ['CSTKK', 'PRM2', 'PRMTKK'],
+            'bromptonmall:1': ['PRM1', 'PRM2'],
+            'happymajung:1': ['PRM2'],
+            'raimdrug:1': ['PRM2'],
+            'mouvepoint:1': ['PRM2', 'PRMTKK'],
+            'mouvepoint:3': ['PRM2'],
+            'riahfolla:1': ['PRM2', 'PRMTKK'],
+            'earthmall:1': ['PRM2'],
+            'housea0912:1': ['PRM2', 'PRMTKK'],
+            'nbnlkr:1': ['PRM2', 'PRM4'],
+            'kkliming:1': ['PRM1', 'PRM2'],
+            'phn0808:1': ['PRM1', 'PRM2', 'PRM4'],
+            'jonsstyle:1': ['PRM2'],
+            'ocoomall83:1': ['PRM2'],
+            'ocoomall83:4': ['PRM2'],
+            'jdaidl:1': ['PRM2', 'PRM3', 'PRM4'],
+            'gimaummall:1': ['PRM2'],
+            'urbanpapa:1': ['PRM2', 'PRM4'],
+            'alrokitchen:1': ['PRM2', 'PRM3', 'PRM4'],
+            'yearning128:1': ['PRM1', 'PRM2'],
+            'lyclinc1:1': ['PRM2'],
+            'lyclinc1:13': ['PRM2'],
+            'amierkorea:1': ['PRM2'],
+            'amierkorea:2': ['PRM2'],
+            'amierkorea:3': ['PRM2'],
+            'welcare1:1': ['PRM2'],
+            'deersm:1': ['PRM2'],
+            'cici3913:1': ['PRM2', 'PRM3', 'PRM4'],
+            'etheroom:1': ['PRM2'],
+            'alleno17:1': ['PRM2'],
+            'sfriendly:1': ['PRM1', 'PRM2'],
+            'thethis:1': ['PRM2'],
+            'thethis:6': ['PRM2'],
+            'jennyoverwillow:1': ['PRM2'],
+            'lazurina001:1': ['PRM2', 'PRM3', 'PRM4'],
+            'melideco:1': ['PRM2'],
+            'melideco:3': ['PRM2'],
+            'nature0622:1': ['PRM2'],
+            'seouli00:1': ['PRM2'],
+            'davidhanbiz:1': ['PRM2'],
+            'davidhanbiz:4': ['PRM2'],
+            'faurea:1': ['PRM2'],
+            'zkxkals1:1': ['PRM2'],
+            'yyl033123:1': ['PRM2'],
+            'yyl033123:2': ['PRM2'],
+            'ortho110:1': ['PRM2'],
+            'choyeonhong:1': ['PRM2'],
+            'loveenb:1': ['PRM2'],
+            'loveenb:4': ['PRM2'],
+            'ppituru:1': ['PRM1', 'PRM2'],
+            'plac01:1': ['PRM2'],
+            'odlykr:1': ['PRM1', 'PRM2'],
+            'mtgcrew4:1': ['PRM2'],
+            'currentbrown:1': ['PRM2'],
+            'surfea:1': ['PRM2'],
+            'lapla:1': ['PRM1', 'PRM2'],
+            'ahaps0:1': ['PRM2'],
+            'nw4668:1': ['PRM2'],
+            'dressvtia:1': ['PRM2'],
+            'dressvtia:6': ['PRM2'],
+            'formlich:1': ['PRM1', 'PRM2'],
+            'dduk2141:1': ['PRM1', 'PRM2'],
+            'dduk2141:8': ['PRM2'],
+            'howkidsful:1': ['PRM2'],
+            'ehdudtyd123:1': ['PRM2'],
+            'mereconte:1': ['PRM2'],
+            'dkvorxhfl:1': ['PRM2'],
+            'xrider9221:1': ['PRM1', 'PRM2'],
+            'sonokongtoy:1': ['PRM2'],
+            'sonokongtoy:6': ['PRM2'],
+            'foren88:1': ['PRM2'],
+            'itiscoolthing:1': ['PRM2'],
+            'bmuet0119:1': ['PRM1', 'PRM2'],
+            'lemetier84:1': ['PRM2'],
+            'seokyung2030:1': ['PRM1', 'PRM2'],
+            'nubo:1': ['PRM2'],
+            'cortte:1': ['PRM2'],
+            'cortte:5': ['PRM2'],
+            'elchltd002:1': ['PRM2'],
+            'yoons0723:1': ['PRM2'],
+            'jchardwarestore:1': ['PRM2'],
+            'lemondetoxkorea1:1': ['PRM2'],
+            'dayone5:1': ['PRM2'],
+            'lemnos:1': ['PRM2'],
+            'candlesoapstory:1': ['PRM1', 'PRM2'],
+            'candlesoapstory:4': ['PRM1', 'PRM2'],
+            'candlesoapstory:15': ['PRM1', 'PRM2'],
+            'ilhwa1:1': ['PRM2'],
+            'eumakplus:1': ['PRM2'],
+            'rugumsp:1': ['PRM2'],
+            'aibel0:1': ['PRM2'],
+            'ptjcorp:1': ['PRM2'],
+            'ptjcorp:7': ['PRM2'],
+            'oddville:1': ['PRM2'],
+            'mahasukha:1': ['PRM1', 'PRM2'],
+            'lalahomekr:1': ['PRM2'],
+            'kyong3542:1': ['PRM2'],
+            'ksk0027:1': ['PRM2'],
+            'ksb455:1': ['PRM2'],
+            'gkduddl2207:1': ['PRM1', 'PRM2'],
+            'gkduddl2207:6': ['PRM2'],
+            'murrenbeauty:1': ['PRM2'],
+            'murrenbeauty:2': ['PRM2'],
+            'lepisodekorea:1': ['PRM2'],
+            'bmfa97:1': ['PRM2'],
+            'bmfa97:6': ['PRM2'],
+            'muhan88:1': ['PRM2'],
+            'muhan88:5': ['PRM2'],
+            'thedaall2:1': ['PRM1', 'PRM2'],
+            'studiogarin1:1': ['PRM2'],
+            'dooodle:1': ['CSTKK', 'PRM2'],
+            'tsuvary:1': ['PRM2'],
+            'buddyboo:1': ['PRM2'],
+            'buddyboo:2': ['PRM2'],
+            'edu25h:1': ['PRM2'],
+            'edu25h:5': ['PRM2'],
+            'convenii:1': ['PRM2'],
+            'convenii:6': ['PRM2'],
+            'colorun:1': ['PRM2'],
+            'colorun:2': ['PRM2'],
+            'kdhmall2020:1': ['CSTKK', 'PRM2'],
+            'comfas:1': ['PRM1', 'PRM2'],
+            'snpeshop:1': ['PRM2'],
+            'mocmo24:1': ['PRM2'],
+            'romp:1': ['PRM1', 'PRM2'],
+            'romp:7': ['PRM1', 'PRM2'],
+            'beaudamo:1': ['PRM2'],
+            'jungjikmall2:1': ['PRM2'],
+            'mcgun:1': ['PRM2'],
+            'mcgun:2': ['PRM2'],
+            'wnsgh13077:1': ['PRM2'],
+            'mrcf:1': ['PRM1', 'PRM2'],
+            'bysec2022:1': ['PRM2'],
+            'bysec2022:7': ['PRM2'],
+            'ideacrew8434:1': ['PRM2'],
+            'wdrobe0507:1': ['PRM1', 'PRM2'],
+            'gnlwns1504:1': ['PRM2'],
+            'negativethree3:1': ['PRM2'],
+            'alsdud0810:1': ['PRM2'],
+            'chinni22:1': ['PRM2'],
+            'trendpick00:1': ['PRM2'],
+            'trendpick00:2': ['PRM2'],
+            'muziktiger:1': ['PRM2'],
+            'bogobiomall:1': ['PRM2'],
+            'bogobiomall:2': ['PRM2'],
+            'coozinmall:1': ['PRM1', 'PRM2'],
+            'coozinmall:3': ['PRM2'],
+            'wingbling:1': ['PRM2'],
+            'wingbling:12': ['PRM2'],
+            'moveaura:1': ['PRM2'],
+            'c9ttang:1': ['PRM2'],
+            'hiwons:1': ['PRM2'],
+            'pestoyoil:1': ['PRM2'],
+            'pestoyoil:3': ['PRM2'],
+            'acebiome1234:1': ['PRM2'],
+            'organiccyclean:1': ['PRM2'],
+            'hosanna83:1': ['PRM2'],
+            'hosanna83:2': ['PRM2'],
+            'aromame77:1': ['PRM2'],
+            'narostar:1': ['PRM2'],
+            'alstkd13579:1': ['PRM1', 'PRM2'],
+            'brmudkorea:1': ['PRM2'],
+            'daehwa01:1': ['PRM2'],
+            'knifemall1:1': ['PRM2'],
+            'knifemall1:3': ['PRM2'],
+            'fractal14:1': ['CSTKK', 'PRM1', 'PRM2', 'PRMTKK'],
+            'changefit1:1': ['PRM2'],
+            'mysellkr:1': ['CSTKK', 'PRM2', 'PRMTKK'],
+            'eaahofficial:1': ['PRM2'],
+            'xxixx0580:1': ['PRM2'],
+            'xxixx0580:5': ['PRM2'],
+            'xxixx0580:6': ['PRM2'],
+            'imallpmg:1': ['PRM2'],
+            'useit:1': ['PRM2'],
+            'nobigdeal2022:1': ['PRM2'],
+            'afloral:1': ['PRM1', 'PRM2'],
+            'afloral:7': ['PRM1', 'PRM2'],
+            'guildstore:1': ['PRM2'],
+            'supernova2012:1': ['PRM2'],
+            'hipeekaboo:1': ['PRM2'],
+            'son4368:1': ['PRM2'],
+            'ubsstore4377:1': ['CSTKK', 'PRM2', 'PRMTKK'],
+            'ubsstore4378:1': ['CSTKK', 'PRM2', 'PRMTKK'],
+            'crewlinks:1': ['PRM2'],
+            'rawrow:1': ['CSTKK', 'PRM2', 'PRMTKK'],
+            'menuad:1': ['PRM1', 'PRM2'],
+            'goodorverygood:1': ['PRM2'],
+            'kind3312:1': ['PRM2'],
+            'luff101:1': ['PRM1', 'PRM2'],
+            'sinsia1024:1': ['PRM2'],
+            'ire0:1': ['PRM1', 'PRM2'],
+            'liptongg:1': ['PRM1', 'PRM2', 'PRM3', 'PRM5', 'PRMTKK'],
+            'chairchair:1': ['PRM2'],
+            'snongline:1': ['CSTKK', 'PRM1', 'PRM2', 'PRMTKK'],
+            'fngbelab:1': ['PRM2'],
+            'ballvic:1': ['PRM2'],
+            'ballvic:7': ['PRM2'],
+            'minizzang7:1': ['PRM1', 'PRM2'],
+            'minizzang7:2': ['PRM2'],
+            'pfpp:1': ['PRM2'],
+            'haancare1:1': ['PRM1', 'PRM2'],
+            'haancare1:3': ['PRM1', 'PRM2'],
+            'haancare1:4': ['PRM1', 'PRM2'],
+            'haancare1:5': ['PRM1', 'PRM2'],
+            'coffeehc:1': ['PRM2'],
+            'ebur2231:1': ['PRM2'],
+            'waverock5:1': ['PRM2', 'PRM5'],
+            // PRM5 specific malls
+            'ninestar01:1': ['PRM5'],
+            'liptongg:1': ['PRM2', 'PRM5'],
+            'fornurse1004:1': ['PRM5'],
+            'equalife:1': ['PRM5'],
+            'yangbongnh:1': ['PRM5'],
+            // PRM1 specific malls
+            'zzann:1': ['PRM1'],
+            'marineteo:1': ['PRM1'],
+            'doblab:1': ['PRM1'],
+            'doblab:5': ['PRM1'],
+            'sabona:1': ['PRM1'],
+            'kidsno1:1': ['PRM1'],
+            'pluz12:1': ['PRM1'],
+            'gopacific:1': ['PRM1', 'PRM4'],
+            'hacie1:1': ['PRM1'],
+            'santa002:1': ['PRM1'],
+            'santa002:2': ['PRM1'],
+            'productonline:1': ['PRM1', 'PRM3', 'PRM4'],
+            'sytrend:1': ['PRM1'],
+            'ntbacon:1': ['PRM1'],
+            'cedartree26:1': ['PRM1'],
+            'funflex:1': ['PRM1'],
+            'funflex:9': ['PRM1'],
+            'sonnetcorp:1': ['PRM1'],
+            'heysummerkr:1': ['PRM1'],
+            'smartmask:1': ['PRM1'],
+            'colordin:1': ['PRM1'],
+            'clearlab100:1': ['PRM1'],
+            'medireturn:1': ['PRM1'],
+            'fldakr:1': ['PRM1'],
+            'lgkhjg:1': ['PRM1'],
+            'lgkhjg:2': ['PRM1'],
+            'abluerkw:1': ['PRM1'],
+            'groupys992:1': ['PRM1'],
+            'groupys772:1': ['PRM1'],
+            'aromaticlabshop:1': ['PRM1', 'PRM3'],
+            'kottiuomo:1': ['PRM1'],
+            'mytheo411:1': ['PRM1'],
+            'jksikim7:1': ['PRM1'],
+            'thedreampartner:1': ['PRM1'],
+            'veining:1': ['PRM1'],
+            'plasia22:1': ['PRM1'],
+            'skincoding:1': ['PRM1'],
+            'broisterkor:1': ['PRM1'],
+            'broisterkor:5': ['PRM1'],
+            'acud2025:1': ['PRM1'],
+            'acud2025:2': ['PRM1'],
+            'drpbg77:1': ['PRM1'],
+            'supporty1:1': ['PRM1'],
+            'artigel:1': ['PRM1'],
+            'barchive23:1': ['PRM1'],
+            'jjkids4031:10': ['PRM1'],
+            'maruwell12:1': ['PRM1'],
+            'brandiz0312:1': ['PRM1'],
+            'biggaia77:1': ['PRM1'],
+            'kangnam4596:1': ['PRM1'],
+            'imdoremi:1': ['PRM1'],
+            'ai1474:1': ['PRM1'],
+            'ai1474:6': ['PRM1'],
+            'tgfnb5242:1': ['PRM1'],
+            'lingseoul2:1': ['PRM1'],
+            'tiacom:2': ['PRM1'],
+            'tiacom:3': ['PRM1'],
+            'tiacom:6': ['PRM1'],
+            'shyoff:1': ['PRM1'],
+            'noticevasam:1': ['PRM1'],
+            'fabcache:1': ['PRM1'],
+            'tracy90020:1': ['PRM1'],
+            'nightsaren:1': ['PRM1'],
+            'equalby:1': ['PRM1'],
+            'groupys993:1': ['PRM1'],
+            'mainsun1:1': ['PRM1'],
+            'djaaksp9911:1': ['PRM1'],
+            'unidiet:1': ['PRM1'],
+            'phytopecia:1': ['PRM1'],
+            'few1:1': ['PRM1'],
+            'sngy:1': ['PRM1'],
+            'buty1:1': ['PRM1'],
+            'misslab:1': ['PRM1'],
+            'thesionco:1': ['PRM1'],
+            'thesionco:2': ['PRM1'],
+            'kuroshio83:1': ['PRM1'],
+            'wadi8002:1': ['PRM1'],
+            'piscess1:1': ['PRM1'],
+            'bis90:1': ['PRM1'],
+            'drumgarage02:1': ['PRM1'],
+            'ludojewelry:1': ['PRM1'],
+            'okmijnpl2535:1': ['PRM1'],
+            'grounded:1': ['PRM1'],
+            'tokyo123:1': ['PRM1'],
+            'flipflower:1': ['PRM1'],
+            'glamwell:1': ['PRM1'],
+            'elevenmay:1': ['PRM1'],
+            'bymisoswim:1': ['PRM1'],
+            'systempler:4': ['PRM1'],
+            'skyminji7:1': ['PRM1'],
+            'yamagobo1:1': ['PRM1'],
+            'mindgood:1': ['PRM1'],
+            'xmiss2004:1': ['PRM1'],
+            'masscon:1': ['PRM1', 'PRM4'],
+            // PRM4 specific malls
+            'mivrine:1': ['PRM3', 'PRM4'],
+            'richgirlcafe:1': ['PRM3', 'PRM4'],
+            'kkotppang1622:1': ['PRM4'],
+            'lovelingjewelry:1': ['PRM4'],
+            'workonit:1': ['PRM3', 'PRM4'],
+            'admdada:1': ['PRM3', 'PRM4'],
+            'admdada:4': ['PRM3', 'PRM4'],
+            'kindabite:1': ['PRM4'],
+            'goodthinkmall:1': ['PRM3', 'PRM4'],
+            'moire2930:1': ['PRM4'],
+            'ngumall:1': ['PRM3', 'PRM4'],
+            'txorbs96:1': ['PRM4'],
+            'ari240201:1': ['PRM3', 'PRM4'],
+            'maisseoul:1': ['PRM4'],
+            'admin19:1': ['PRM4'],
+            'paulsboutique1:1': ['PRM4'],
+            'sktea:1': ['PRM3', 'PRM4'],
+            'jtesoro103:1': ['PRM3', 'PRM4'],
+            'dongwha7112:1': ['PRM4'],
+            'teeth319:1': ['PRM4'],
+            'commonnuovo1:1': ['PRM4'],
+            'wriggling:1': ['PRM4'],
+            'shin25641:1': ['PRM4'],
+            'doodress:1': ['PRM4'],
+            'cacle09:1': ['PRM4'],
+            'ch0i3180:1': ['PRM4'],
+            'dcollec:1': ['PRM4'],
+            'moden12345:1': ['PRM4'],
+            'moden12345:3': ['PRM4'],
+            'ddalku79:1': ['PRM4'],
+            'themoon85:1': ['PRM4'],
+            'bilybabybily:1': ['PRM4'],
+            'instinctus1:1': ['PRM4'],
+            'eminandpaul75:1': ['PRM4'],
+            'viare0:1': ['PRM4'],
+            'elizabeth88admin:1': ['PRM4'],
+            'fobico:1': ['PRM4'],
+            'teddytales:1': ['PRM4'],
+            'teddytales:3': ['PRM4'],
+            'gripswany:1': ['PRM4'],
+            'gripswany:2': ['PRM4'],
+            'dressuad:1': ['PRM4'],
+            'omittedkr:1': ['PRM4'],
+            'omittedkr:4': ['PRM4'],
+            'juyabet:1': ['PRM4'],
+            'levdance:1': ['PRM4'],
+            'hoyeonnn12:1': ['PRM4'],
+            'hoyeonnn12:2': ['PRM4'],
+            'sr101:1': ['PRM4'],
+            'mev706:1': ['PRM4'],
+            'onzak:1': ['PRM4'],
+            'legodtofficial:1': ['PRM4'],
+            'brooksbrothers:1': ['PRM4'],
+            'lifeofficial:4': ['PRM4'],
+            'kiehif:1': ['PRM4'],
+            'harugonggan:1': ['PRM4'],
+            'dalbangoo12:1': ['PRM4'],
+            'piumuniform1:1': ['PRM4'],
+            'chaewoodak:1': ['PRM4'],
+            'lijamong18:1': ['PRM4'],
+            'collagekorea:1': ['PRM4'],
+            // PRM3 specific malls
+            'rollendar:1': ['PRM3'],
+            'eastblue8282:1': ['PRM3'],
+            'allbe11:1': ['PRM3'],
+            // PRMTKK specific malls
+            'shamel8286:1': ['PRMTKK'],
+            'gopacific:1': ['PRMTKK'],
+            'mivrine:1': ['PRMTKK'],
+            'kkliming:1': ['PRMTKK'],
+            'richgirlcafe:1': ['PRMTKK'],
+            'ryqhrahf:1': ['PRMTKK'],
+            'ryqhrahf:2': ['PRMTKK'],
+            'ryqhrahf:7': ['PRMTKK'],
+            'jonsstyle:1': ['PRMTKK'],
+            'workonit:1': ['PRMTKK'],
+            'gimaummall:1': ['PRMTKK'],
+            'productonline:1': ['PRMTKK'],
+            'urbanpapa:1': ['PRMTKK'],
+            'hs9779:1': ['PRMTKK'],
+            'ninestar01:1': ['PRMTKK'],
+            'alrokitchen:1': ['PRMTKK'],
+            'yearning128:1': ['PRMTKK'],
+            'goodthinkmall:1': ['PRMTKK'],
+            'lyclinc1:1': ['PRMTKK'],
+            'ngumall:1': ['PRMTKK'],
+            'deersm:1': ['PRMTKK'],
+            'ari240201:1': ['PRMTKK'],
+            'etheroom:1': ['PRMTKK'],
+            'sp89114:1': ['PRMTKK'],
+            'thethis:1': ['PRMTKK'],
+            'thethis:6': ['PRMTKK'],
+            'jennyoverwillow:1': ['PRMTKK'],
+            'lazurina001:1': ['PRMTKK'],
+            'melideco:1': ['PRMTKK'],
+            'nature0622:1': ['PRMTKK'],
+            'seouli00:1': ['PRMTKK'],
+            'spcare01:1': ['PRMTKK'],
+            'spcare01:2': ['PRMTKK'],
+            'gpoutdoors:1': ['PRMTKK'],
+            'jtesoro103:1': ['PRMTKK'],
+            'ppituru:1': ['PRMTKK'],
+            'plac01:1': ['PRMTKK'],
+            'toweljongga:1': ['PRMTKK'],
+            'mtgcrew4:1': ['PRMTKK'],
+            'skincoding:1': ['PRMTKK'],
+            'surfea:1': ['PRMTKK'],
+            'nw4668:1': ['PRMTKK'],
+            'artplex:1': ['PRMTKK'],
+            'dduk2141:1': ['PRMTKK'],
+            'wriggling:1': ['PRMTKK'],
+            'howkidsful:1': ['PRMTKK'],
+            'shin25641:1': ['PRMTKK'],
+            'ehdudtyd123:1': ['PRMTKK'],
+            'ch0i3180:1': ['PRMTKK'],
+            'sonokongtoy:1': ['PRMTKK'],
+            'dcollec:1': ['PRMTKK'],
+            'bmuet0119:1': ['PRMTKK'],
+            'seokyung2030:1': ['PRMTKK'],
+            'maruwell12:1': ['PRMTKK'],
+            'nubo:1': ['PRMTKK'],
+            'cortte:1': ['PRMTKK'],
+            'elchltd002:1': ['PRMTKK'],
+            'livinbalance:1': ['PRMTKK'],
+            'dayone5:1': ['PRMTKK'],
+            'lemnos:1': ['PRMTKK'],
+            'candlesoapstory:1': ['PRMTKK'],
+            'candlesoapstory:4': ['PRMTKK'],
+            'candlesoapstory:15': ['PRMTKK'],
+            'eumakplus:1': ['PRMTKK'],
+            'bilybabybily:1': ['PRMTKK'],
+            'eminandpaul75:1': ['PRMTKK'],
+            'fobico:1': ['PRMTKK'],
+            'oddville:1': ['PRMTKK'],
+            'mahasukha:1': ['PRMTKK'],
+            'kyong3542:1': ['PRMTKK'],
+            'beadstamin:1': ['PRMTKK'],
+            'beadstamin:4': ['PRMTKK'],
+            'shyoff:1': ['PRMTKK'],
+            'ksk0027:1': ['PRMTKK'],
+            'ksb455:1': ['PRMTKK'],
+            'gkduddl2207:1': ['PRMTKK'],
+            'bmfa97:1': ['PRMTKK'],
+            'goldrony:1': ['PRMTKK'],
+            'muhan88:1': ['PRMTKK'],
+            'thedaall2:1': ['PRMTKK'],
+            'teddytales:1': ['PRMTKK'],
+            'teddytales:3': ['PRMTKK'],
+            'dressuad:1': ['PRMTKK'],
+            'moospo:1': ['PRMTKK'],
+            'alzkql2:1': ['PRMTKK'],
+            'buddyboo:1': ['PRMTKK'],
+            'juyabet:1': ['PRMTKK'],
+            'edu25h:1': ['PRMTKK'],
+            'edu25h:5': ['PRMTKK'],
+            'colorun:1': ['PRMTKK'],
+            'comfas:1': ['PRMTKK'],
+            'mocmo24:1': ['PRMTKK'],
+            'romp:1': ['PRMTKK'],
+            'romp:7': ['PRMTKK'],
+            'mrcf:1': ['PRMTKK'],
+            'fingerheel:1': ['PRMTKK'],
+            'ideacrew8434:1': ['PRMTKK'],
+            'yousunwkd777:1': ['PRMTKK'],
+            'gnlwns1504:1': ['PRMTKK'],
+            'negativethree3:1': ['PRMTKK'],
+            'alsdud0810:1': ['PRMTKK'],
+            'igotprice:1': ['PRMTKK'],
+            'levdance:1': ['PRMTKK'],
+            'heriter:1': ['PRMTKK'],
+            'chinni22:1': ['PRMTKK'],
+            'sr101:1': ['PRMTKK'],
+            'mev706:1': ['PRMTKK'],
+            'trendpick00:1': ['PRMTKK'],
+            'muziktiger:1': ['PRMTKK'],
+            'bogobiomall:1': ['PRMTKK'],
+            'bogobiomall:2': ['PRMTKK'],
+            'coozinmall:1': ['PRMTKK'],
+            'moveaura:1': ['PRMTKK'],
+            'hiwons:1': ['PRMTKK'],
+            'onzak:1': ['PRMTKK'],
+            'na820617:1': ['PRMTKK'],
+            'hosanna83:1': ['PRMTKK'],
+            'hosanna83:2': ['PRMTKK'],
+            'narostar:1': ['PRMTKK'],
+            'alstkd13579:1': ['PRMTKK'],
+            'karman0826:1': ['PRMTKK'],
+            'karman0826:8': ['PRMTKK'],
+            'brmudkorea:1': ['PRMTKK'],
+            'knifemall1:1': ['PRMTKK'],
+            'changefit1:1': ['PRMTKK'],
+            'eaahofficial:1': ['PRMTKK'],
+            'tuobag:1': ['PRMTKK'],
+            'grounded:1': ['PRMTKK'],
+            'xxixx0580:1': ['PRMTKK'],
+            'imallpmg:1': ['PRMTKK'],
+            'useit:1': ['PRMTKK'],
+            'nobigdeal2022:1': ['PRMTKK'],
+            'afloral:1': ['PRMTKK'],
+            'afloral:7': ['PRMTKK'],
+            'guildstore:1': ['PRMTKK'],
+            'supernova2012:1': ['PRMTKK'],
+            'hipeekaboo:1': ['PRMTKK'],
+            'son4368:1': ['PRMTKK'],
+            'crewlinks:1': ['PRMTKK'],
+            'menuad:1': ['PRMTKK'],
+            'goodorverygood:1': ['PRMTKK'],
+            'luff101:1': ['PRMTKK'],
+            'sinsia1024:1': ['PRMTKK'],
+            'elevenmay:1': ['PRMTKK'],
+            'elevenmay:5': ['PRMTKK'],
+            'jungsungeun:1': ['PRMTKK'],
+            'ire0:1': ['PRMTKK'],
+            'designheal:1': ['PRMTKK'],
+            'ozonz:1': ['PRMTKK'],
+            'chairchair:1': ['PRMTKK'],
+            'fornurse1004:1': ['PRMTKK'],
+            'lijamong18:1': ['PRMTKK'],
+            'fngbelab:1': ['PRMTKK'],
+            'skyminji7:1': ['PRMTKK'],
+            'ballvic:1': ['PRMTKK'],
+            'ballvic:7': ['PRMTKK'],
+            'minizzang7:1': ['PRMTKK'],
+            'mindgood:1': ['PRMTKK'],
+            'xmiss2004:1': ['PRMTKK'],
+            'waverock5:1': ['PRMTKK'],
+            'equalife:1': ['PRMTKK'],
+            
+            // CSTKK specific malls
+            'premale:1': ['CSTKK'],
+            'furnituredotcom:1': ['CSTKK', 'PRMTKK']
+        };
+
+        // Search function
+        function searchMall() {
+            const searchTerm = document.getElementById('mallSearch').value.trim().toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsDiv.classList.remove('show');
+                return;
+            }
+
+            const results = [];
+            
+            // Search for exact match
+            if (mallModuleMapping[searchTerm]) {
+                results.push({
+                    mall: searchTerm,
+                    modules: mallModuleMapping[searchTerm]
+                });
+            } else {
+                // Search for partial matches
+                for (const [mall, modules] of Object.entries(mallModuleMapping)) {
+                    if (mall.includes(searchTerm)) {
+                        results.push({
+                            mall: mall,
+                            modules: modules
+                        });
+                    }
+                }
+            }
+
+            displaySearchResults(results);
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">No malls found</div>';
+                resultsDiv.classList.add('show');
+                return;
+            }
+
+            let html = '';
+            results.forEach(result => {
+                html += `
+                    <div class="search-result-item">
+                        <div class="search-result-mall">${result.mall}</div>
+                        <div class="search-result-modules">
+                            ${result.modules.map(module => 
+                                `<span class="search-result-module">${module}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.add('show');
+        }
+
+        // Add enter key support and click outside to close
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('mallSearch');
+            const resultsDiv = document.getElementById('searchResults');
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchMall();
+                }
+            });
+
+            // Close results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) {
+                    resultsDiv.classList.remove('show');
+                }
+            });
+        });
+
+        // Toggle collapse functionality for inactive modules
+        function toggleCollapse(header) {
+            const mainGroup = header.parentElement;
+            const content = mainGroup.querySelector('.collapsible-content');
+            const workItems = content.querySelectorAll('.subgroup');
+            
+            mainGroup.classList.toggle('collapsed');
+            
+            // Add scroll functionality for modules with many items (more than 10)
+            if (!mainGroup.classList.contains('collapsed') && workItems.length > 10) {
+                content.classList.add('expanded');
+            } else {
+                content.classList.remove('expanded');
+            }
+        }
+
+        // Update all work items with titles on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const workItems = document.querySelectorAll('.work-item');
+            workItems.forEach(item => {
+                const workCode = item.textContent.trim();
+                if (workTitles[workCode]) {
+                    item.innerHTML = createWorkItem(workCode);
+                }
+            });
+        });
+
+        // Add click handlers for groups (non-collapsible headers only)
+        document.querySelectorAll('.subgroup').forEach(subgroup => {
+            subgroup.addEventListener('click', function() {
+                const groupName = this.querySelector('.subgroup-name').textContent;
+                console.log('Selected group:', groupName);
+                // Add your group selection logic here
+            });
+        });
+
+        // Only add click handlers to non-collapsible headers
+        document.querySelectorAll('.main-group-header:not(.collapsible-header)').forEach(header => {
+            header.addEventListener('click', function() {
+                const groupName = this.textContent.split('\n')[0].trim();
+                console.log('Selected main group:', groupName);
+                // Add your main group selection logic here
+            });
+        });
+    </script>
+</body>
+</html>
