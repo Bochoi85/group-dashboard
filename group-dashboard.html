@@ -35,19 +35,23 @@
         .search-container {
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
             position: relative;
-            min-width: 300px;
+            background: white;
+            border-radius: 6px;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
         }
 
         .search-input {
-            padding: 10px 12px;
-            border: 2px solid #ddd;
-            border-radius: 25px;
-            font-size: 14px;
+            padding: 6px 35px 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 16px;
+            font-size: 12px;
             width: 100%;
             outline: none;
             transition: border-color 0.3s ease;
+            box-sizing: border-box;
         }
 
         .search-input:focus {
@@ -56,16 +60,20 @@
 
         .search-button {
             position: absolute;
-            right: 5px;
-            top: 5px;
+            right: 10px;
+            top: 10px;
             background: #007bff;
             border: none;
             border-radius: 50%;
-            width: 35px;
-            height: 35px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 11px;
+            color: white;
             transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .search-button:hover {
@@ -74,15 +82,14 @@
 
         .search-results {
             position: absolute;
-            top: 50px;
+            top: 35px;
+            left: 0;
             right: 0;
             background: white;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            max-width: 400px;
-            min-width: 300px;
-            max-height: 400px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            max-height: 200px;
             overflow-y: auto;
             z-index: 1000;
             display: none;
@@ -93,7 +100,7 @@
         }
 
         .search-result-item {
-            padding: 12px 16px;
+            padding: 8px 12px;
             border-bottom: 1px solid #eee;
         }
 
@@ -104,8 +111,9 @@
         .search-result-mall {
             font-weight: bold;
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             font-family: monospace;
+            font-size: 12px;
         }
 
         .search-result-modules {
@@ -117,10 +125,28 @@
         .search-result-module {
             background: #e3f2fd;
             color: #1976d2;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
             font-weight: 500;
+        }
+
+        .clickable-module {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .clickable-module:hover {
+            background: #1976d2;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid #1976d2;
+        }
+
+        .clickable-module:active {
+            transform: translateY(0);
         }
 
         .no-results {
@@ -452,81 +478,183 @@
         .collapsible-content::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+
+        /* Two-column layout */
+        .dashboard-content {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 600px;
+        }
+
+        .right-panel {
+            flex: 0 0 380px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .right-panel h2 {
+            margin: 0 0 15px 0;
+            color: #495057;
+            font-size: 16px;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 8px;
+        }
+
+        /* Management panel styles */
+        .management-panel {
+            background: white;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        .management-panel h3 {
+            margin: 0 0 12px 0;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Action button styles */
+        .action-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s;
+            margin-top: 5px;
+        }
+
+        .action-button:hover {
+            background: #0056b3;
+        }
+
+        .action-button.add-button {
+            background: #28a745;
+        }
+
+        .action-button.add-button:hover {
+            background: #218838;
+        }
+
+        .action-button.delete-button {
+            background: #dc3545;
+        }
+
+        .action-button.delete-button:hover {
+            background: #c82333;
+        }
+
+        /* Result message styles */
+        .result-message {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            display: none;
+        }
+
+        /* Input panel styles */
+        .input-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 13px;
+        }
+
+        .input-group input, .input-group select, .input-field {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .submit-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .submit-button:hover {
+            background: #218838;
+        }
+
+        .submit-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .submit-button[style*="background: #dc3545"]:hover {
+            background: #c82333 !important;
+        }
+
+        /* Adjust header for smaller width */
+        .dashboard-header {
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+        }
     </style>
 </head>
 <body>
     <div class="dashboard">
         <div class="dashboard-header">
-            <h1 class="dashboard-title">Group Management Dashboard</h1>
-            <div class="search-container">
-                <input type="text" 
-                       id="mallSearch" 
-                       placeholder="Search mall_id:shop_no (e.g., haveainc:1)" 
-                       class="search-input">
-                <button onclick="searchMall()" class="search-button">🔍</button>
-                <div id="searchResults" class="search-results"></div>
-            </div>
+            <h1 class="dashboard-title">작업그룹 및 제외현황 관리 대시보드</h1>
         </div>
         
-        <!-- Acting Groups Section -->
+        <div class="dashboard-content">
+            <!-- Left Panel: Module Lists -->
+            <div class="left-panel">
+                <!-- Work Modules Section -->
         <div class="group-section">
-            <h2 class="section-title acting-title">Acting Groups</h2>
-            
-            <!-- PRO K2K Group -->
-            <div class="main-group">
-                <div class="main-group-header k2k-header">
-                    PRO K2K
-                    <span class="group-count">3</span>
-                </div>
-                <div class="subgroups">
-                    <div class="subgroup">
-                        <div class="subgroup-name">PRO 유튜브</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name">PRO B2B</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name">PRO K2K SEO ONLY</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- PRO K2G Group -->
-            <div class="main-group">
-                <div class="main-group-header k2g-header">
-                    PRO K2G
-                    <span class="group-count">2</span>
-                </div>
-                <div class="subgroups">
-                    <div class="subgroup">
-                        <div class="subgroup-name">PRO K2G EN</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name">PRO K2G JP</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- PRO G2G Group -->
-            <div class="main-group">
-                <div class="main-group-header g2g-header">
-                    PRO G2G
-                    <span class="group-count">2</span>
-                </div>
-                <div class="subgroups">
-                    <div class="subgroup">
-                        <div class="subgroup-name">PRO G2G EN</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name">PRO G2G JP</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Inactive Groups Section -->
-        <div class="group-section">
-            <h2 class="section-title inactive-title">Inactive Groups (Work Modules)</h2>
+            <h2 class="section-title inactive-title">Work Modules</h2>
             
             <!-- PAUSE Module -->
             <div class="main-group collapsed">
@@ -726,6 +854,40 @@
                     <div class="subgroup">
                         <div class="subgroup-name work-item">MO010</div>
                     </div>
+                    
+                    <!-- PAUSE Mall Information -->
+                    <div class="mall-info-section">
+                        <div class="mall-info-header collapsed" onclick="toggleMallInfo(this)">
+                            🏪 Mall Information <span class="mall-count">(25 shops)</span>
+                            <span class="mall-collapse-icon">▼</span>
+                        </div>
+                        <div class="mall-list collapsed">
+                            <div class="mall-item">seouli00 (shop: 1)</div>
+                            <div class="mall-item">itiscoolthing (shop: 1)</div>
+                            <div class="mall-item">lemetier84 (shop: 1)</div>
+                            <div class="mall-item">lalahomekr (shop: 1)</div>
+                            <div class="mall-item">tsuvary (shop: 1)</div>
+                            <div class="mall-item">buddyboo (shop: 1, 2)</div>
+                            <div class="mall-item">jungjikmall2 (shop: 1)</div>
+                            <div class="mall-item">mcgun (shop: 1)</div>
+                            <div class="mall-item">wnsgh13077 (shop: 1)</div>
+                            <div class="mall-item">bysec2022 (shop: 7)</div>
+                            <div class="mall-item">wingbling (shop: 1, 12)</div>
+                            <div class="mall-item">pestoyoil (shop: 1)</div>
+                            <div class="mall-item">legodtofficial (shop: 1)</div>
+                            <div class="mall-item">brooksbrothers (shop: 1)</div>
+                            <div class="mall-item">rockportbki (shop: 1)</div>
+                            <div class="mall-item">odenserepresent (shop: 1)</div>
+                            <div class="mall-item">lifeofficial (shop: 4)</div>
+                            <div class="mall-item">pyrenexhome (shop: 1)</div>
+                            <div class="mall-item">ppcompany1 (shop: 1)</div>
+                            <div class="mall-item">xxixx0580 (shop: 1)</div>
+                            <div class="mall-item">useit (shop: 1)</div>
+                            <div class="mall-item">snongline (shop: 1)</div>
+                            <div class="mall-item">ebur2231 (shop: 1)</div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
             
@@ -771,6 +933,7 @@
                     <div class="subgroup">
                         <div class="subgroup-name work-item">FA208</div>
                     </div>
+                    
                 </div>
             </div>
             
@@ -794,189 +957,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Single Work Section -->
-            <div class="team-section team-collapsed">
-                <div class="team-title single-work-title" onclick="toggleTeam(this)">
-                    Single Work
-                    <span class="group-count">47</span>
-                    <span class="dependency-tag">K2K</span>
-                    <span class="team-collapse-icon">▼</span>
-                </div>
-                <div class="team-content subgroups scrollable">
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG001</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG003</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG006</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG007</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG008</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG009</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG010</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG015</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG017</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG018</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG019</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG020</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG021</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG023</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG035</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG051</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">EG069</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA001</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA005</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA007</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA009</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA010</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA011</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA012</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA013</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA014</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA016</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA017</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA019</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA022</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA024</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA025</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA026</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA027</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA028</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA029</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA030</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA039</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA045</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA047</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA049</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA050</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA083</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA084</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA085</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA093</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA106</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA107</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA125</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA179</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA180</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA181</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA182</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA183</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA221</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA230</div>
-                    </div>
-                    <div class="subgroup">
-                        <div class="subgroup-name work-item">FA242</div>
-                    </div>
-                </div>
-            </div> <!-- End Single Work -->
             
             <!-- FAS운영1팀 Section -->
             <div class="team-section team-collapsed">
@@ -2576,7 +2556,246 @@
             </div>
             </div> <!-- End team-content -->
             </div> <!-- End FAS운영3팀 -->
+            
+            <!-- Single Work Section -->
+            <div class="team-section team-collapsed">
+                <div class="team-title single-work-title" onclick="toggleTeam(this)">
+                    Single Work
+                    <span class="group-count">47</span>
+                    <span class="dependency-tag">K2K</span>
+                    <span class="team-collapse-icon">▼</span>
+                </div>
+                <div class="team-content subgroups scrollable">
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG003</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG006</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG008</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG015</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG018</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG020</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG021</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG023</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG035</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG051</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">EG069</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA001</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA005</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA007</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA009</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA010</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA011</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA012</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA013</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA014</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA016</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA017</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA019</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA022</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA024</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA025</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA026</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA027</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA028</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA029</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA030</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA039</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA045</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA047</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA049</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA050</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA083</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA084</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA085</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA093</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA106</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA107</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA125</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA179</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA180</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA181</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA182</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA183</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA221</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA230</div>
+                    </div>
+                    <div class="subgroup">
+                        <div class="subgroup-name work-item">FA242</div>
+                    </div>
+                </div>
+            </div> <!-- End Single Work -->
         </div>
+            </div> <!-- End left-panel -->
+            
+            <!-- Right Panel: Search & Input -->
+            <div class="right-panel">
+                <h2>🔍 Search & Manage</h2>
+                
+                <!-- Search Section -->
+                <div class="search-container">
+                    <input type="text" 
+                           id="mallSearch" 
+                           placeholder="Search mall_id:shop_no (e.g., haveainc:1)" 
+                           class="search-input">
+                    <button onclick="searchMall()" class="search-button">🔍</button>
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+                
+                <!-- Add New Mall Assignment -->
+                <div class="management-panel">
+                    <h3>➕ Add New Mall Assignment</h3>
+                    <div class="input-group">
+                        <label for="taskNumber">Task Number:</label>
+                        <input type="text" id="taskNumber" placeholder="e.g., TASK-2024-001" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="mallId">Mall ID:</label>
+                        <input type="text" id="mallId" placeholder="e.g., haveainc" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="shopNo">Shop Number:</label>
+                        <input type="text" id="shopNo" placeholder="e.g., 1" class="input-field">
+                    </div>
+                    <button onclick="addMallAssignment()" class="action-button add-button">Add Assignment</button>
+                    <div id="addResult" class="result-message"></div>
+                </div>
+                
+                <!-- Delete Mall Assignment -->
+                <div class="management-panel">
+                    <h3>🗑️ Delete Mall Assignment</h3>
+                    <div class="input-group">
+                        <label for="deleteTaskNumber">Task Number:</label>
+                        <input type="text" id="deleteTaskNumber" placeholder="e.g., TASK-2024-001" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="deleteMallId">Mall ID:</label>
+                        <input type="text" id="deleteMallId" placeholder="e.g., haveainc" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="deleteShopNo">Shop Number:</label>
+                        <input type="text" id="deleteShopNo" placeholder="e.g., 1" class="input-field">
+                    </div>
+                    <button onclick="deleteMallAssignment()" class="action-button delete-button">Delete Assignment</button>
+                    <div id="deleteResult" class="result-message"></div>
+                </div>
+                
+            </div>
+        </div> <!-- End dashboard-content -->
     </div>
 
     <script>
@@ -3172,7 +3391,7 @@
             'ire0:1': ['PRM1', 'PRM2'],
             'liptongg:1': ['PRM1', 'PRM2', 'PRM3', 'PRM5', 'PRMTKK'],
             'chairchair:1': ['PRM2'],
-            'snongline:1': ['CSTKK', 'PRM1', 'PRM2', 'PRMTKK'],
+            'snongline:1': ['CSTKK', 'PAUSE', 'PRM1', 'PRM2', 'PRMTKK'],
             'fngbelab:1': ['PRM2'],
             'ballvic:1': ['PRM2'],
             'ballvic:7': ['PRM2'],
@@ -3353,6 +3572,27 @@
             'rollendar:1': ['PRM3'],
             'eastblue8282:1': ['PRM3'],
             'allbe11:1': ['PRM3'],
+            // PAUSE specific malls
+            'itiscoolthing:1': ['PAUSE'],
+            'lemetier84:1': ['PAUSE'],
+            'lalahomekr:1': ['PAUSE'],
+            'tsuvary:1': ['PAUSE'],
+            'jungjikmall2:1': ['PAUSE'],
+            'mcgun:1': ['PAUSE'],
+            'wnsgh13077:1': ['PAUSE'],
+            'bysec2022:7': ['PAUSE'],
+            'wingbling:1': ['PAUSE'],
+            'wingbling:12': ['PAUSE'],
+            'pestoyoil:1': ['PAUSE'],
+            'legodtofficial:1': ['PAUSE'],
+            'brooksbrothers:1': ['PAUSE'],
+            'rockportbki:1': ['PAUSE'],
+            'odenserepresent:1': ['PAUSE'],
+            'lifeofficial:4': ['PAUSE'],
+            'pyrenexhome:1': ['PAUSE'],
+            'ppcompany1:1': ['PAUSE'],
+            'ebur2231:1': ['PAUSE'],
+            
             // PRMTKK specific malls
             'shamel8286:1': ['PRMTKK'],
             'gopacific:1': ['PRMTKK'],
@@ -3384,7 +3624,7 @@
             'lazurina001:1': ['PRMTKK'],
             'melideco:1': ['PRMTKK'],
             'nature0622:1': ['PRMTKK'],
-            'seouli00:1': ['PRMTKK'],
+            'seouli00:1': ['PAUSE', 'PRMTKK'],
             'spcare01:1': ['PRMTKK'],
             'spcare01:2': ['PRMTKK'],
             'gpoutdoors:1': ['PRMTKK'],
@@ -3439,7 +3679,8 @@
             'dressuad:1': ['PRMTKK'],
             'moospo:1': ['PRMTKK'],
             'alzkql2:1': ['PRMTKK'],
-            'buddyboo:1': ['PRMTKK'],
+            'buddyboo:1': ['PAUSE', 'PRMTKK'],
+            'buddyboo:2': ['PAUSE'],
             'juyabet:1': ['PRMTKK'],
             'edu25h:1': ['PRMTKK'],
             'edu25h:5': ['PRMTKK'],
@@ -3482,9 +3723,9 @@
             'eaahofficial:1': ['PRMTKK'],
             'tuobag:1': ['PRMTKK'],
             'grounded:1': ['PRMTKK'],
-            'xxixx0580:1': ['PRMTKK'],
+            'xxixx0580:1': ['PAUSE', 'PRMTKK'],
             'imallpmg:1': ['PRMTKK'],
-            'useit:1': ['PRMTKK'],
+            'useit:1': ['PAUSE', 'PRMTKK'],
             'nobigdeal2022:1': ['PRMTKK'],
             'afloral:1': ['PRMTKK'],
             'afloral:7': ['PRMTKK'],
@@ -3554,6 +3795,58 @@
             displaySearchResults(results);
         }
 
+        // Navigate to specific module
+        function navigateToModule(moduleName) {
+            // Find the module header with the matching name
+            const headers = document.querySelectorAll('.main-group-header');
+            let targetHeader = null;
+            
+            for (let header of headers) {
+                const headerText = header.textContent.trim();
+                if (headerText.includes(moduleName)) {
+                    targetHeader = header;
+                    break;
+                }
+            }
+            
+            if (targetHeader) {
+                const mainGroup = targetHeader.closest('.main-group');
+                
+                // First, check if this module is inside a team section and expand the team if needed
+                const teamSection = mainGroup.closest('.team-section');
+                if (teamSection && teamSection.classList.contains('team-collapsed')) {
+                    const teamTitle = teamSection.querySelector('.team-title');
+                    if (teamTitle) {
+                        teamTitle.click(); // This will expand the team section
+                    }
+                }
+                
+                // Small delay to allow team expansion animation to start
+                setTimeout(() => {
+                    // Expand the module if it's collapsed
+                    if (mainGroup && mainGroup.classList.contains('collapsed')) {
+                        targetHeader.click(); // This will expand the module
+                    }
+                    
+                    // Scroll to the module with some offset for better visibility
+                    setTimeout(() => {
+                        targetHeader.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
+                        });
+                        
+                        // Add a highlight effect
+                        mainGroup.style.border = '3px solid #007bff';
+                        mainGroup.style.borderRadius = '8px';
+                        setTimeout(() => {
+                            mainGroup.style.border = '';
+                            mainGroup.style.borderRadius = '';
+                        }, 2000);
+                    }, 200);
+                }, 100);
+            }
+        }
+
         // Display search results
         function displaySearchResults(results) {
             const resultsDiv = document.getElementById('searchResults');
@@ -3571,7 +3864,7 @@
                         <div class="search-result-mall">${result.mall}</div>
                         <div class="search-result-modules">
                             ${result.modules.map(module => 
-                                `<span class="search-result-module">${module}</span>`
+                                `<span class="search-result-module clickable-module" onclick="navigateToModule('${module}')" title="Click to go to ${module} module">${module}</span>`
                             ).join('')}
                         </div>
                     </div>
@@ -3580,6 +3873,96 @@
 
             resultsDiv.innerHTML = html;
             resultsDiv.classList.add('show');
+        }
+
+        // Add new mall assignment
+        function addMallAssignment() {
+            const taskNumber = document.getElementById('taskNumber').value.trim();
+            const mallId = document.getElementById('mallId').value.trim();
+            const shopNo = document.getElementById('shopNo').value.trim();
+            const resultDiv = document.getElementById('addResult');
+            
+            // Validation
+            if (!taskNumber || !mallId || !shopNo) {
+                resultDiv.innerHTML = '❌ Please fill in all fields';
+                resultDiv.style.backgroundColor = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.style.border = '1px solid #f5c6cb';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // Create the mall:shop key
+            const mallKey = `${mallId}:${shopNo}`;
+            
+            // Since no module is specified, this is a general assignment record
+            resultDiv.innerHTML = `✅ Successfully recorded assignment:<br><strong>${mallKey}</strong> (Task: ${taskNumber})`;
+            resultDiv.style.backgroundColor = '#d4edda';
+            resultDiv.style.color = '#155724';
+            resultDiv.style.border = '1px solid #c3e6cb';
+            resultDiv.style.display = 'block';
+            
+            // Clear the form
+            document.getElementById('taskNumber').value = '';
+            document.getElementById('mallId').value = '';
+            document.getElementById('shopNo').value = '';
+            
+            // Hide result after 5 seconds
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Delete mall assignment
+        function deleteMallAssignment() {
+            const deleteTaskNumber = document.getElementById('deleteTaskNumber').value.trim();
+            const deleteMallId = document.getElementById('deleteMallId').value.trim();
+            const deleteShopNo = document.getElementById('deleteShopNo').value.trim();
+            const resultDiv = document.getElementById('deleteResult');
+            
+            // Validation
+            if (!deleteTaskNumber || !deleteMallId || !deleteShopNo) {
+                resultDiv.innerHTML = '❌ Please fill in all fields';
+                resultDiv.style.backgroundColor = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.style.border = '1px solid #f5c6cb';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // Create the mall:shop key
+            const mallKey = `${deleteMallId}:${deleteShopNo}`;
+            
+            // Check if this mall:shop exists
+            if (!mallModuleMapping[mallKey]) {
+                resultDiv.innerHTML = `❌ ${mallKey} not found in any module`;
+                resultDiv.style.backgroundColor = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.style.border = '1px solid #f5c6cb';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            const originalModules = [...mallModuleMapping[mallKey]];
+            
+            // Remove from ALL modules since no specific module is selected
+            delete mallModuleMapping[mallKey];
+            resultDiv.innerHTML = `✅ Completely removed ${mallKey} from all modules<br><small>Task: ${deleteTaskNumber}<br>Was previously assigned to: ${originalModules.join(', ')}</small>`;
+            
+            resultDiv.style.backgroundColor = '#d4edda';
+            resultDiv.style.color = '#155724';
+            resultDiv.style.border = '1px solid #c3e6cb';
+            resultDiv.style.display = 'block';
+            
+            // Clear the form
+            document.getElementById('deleteTaskNumber').value = '';
+            document.getElementById('deleteMallId').value = '';
+            document.getElementById('deleteShopNo').value = '';
+            
+            // Hide result after 5 seconds
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
         }
 
         // Add enter key support and click outside to close
